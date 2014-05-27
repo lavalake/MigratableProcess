@@ -70,7 +70,6 @@ public class ProcessWorker {
 				worker.oos.close();
 				worker.ois.close();
 				worker.socket.close();
-				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
