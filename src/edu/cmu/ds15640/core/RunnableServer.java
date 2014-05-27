@@ -51,13 +51,18 @@ public class RunnableServer implements Runnable {
 			MigratableProcess process = replyCommand.getMigratableProcess();
 			int workerID = replyCommand.getTargetWorkerID();
 			Socket s = ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getSocket();
-			ObjectOutputStream oos;
+			ObjectOutputStream oos = null;
 			try {
 				oos = new ObjectOutputStream(s.getOutputStream());
-				SendCommand sc = new SendCommand(CommandType.START, process);
+				SendCommand sc = new SendCommand(CommandType.MIGRATESTART, process);
 				oos.writeObject(sc);
 			} catch (IOException e) {
 				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());
+			} finally{
+				try {
+					oos.close();
+				} catch (IOException e) {
+				}
 			}
 			break;
 		case "info":

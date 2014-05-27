@@ -154,11 +154,15 @@ public class ProcessManager {
 		if(strs == null || strs.length < 3){
 			System.out.println("Wrong arguments, type 'help' for more information");
 		}
-		int workerID;
+		int workerID = -1;
 		try {
 			workerID = Integer.parseInt(strs[1]);
 		} catch (Exception e) {
 			System.out.println(e.toString());
+			return;
+		}
+		if(!workerToWorkerInfo.contains(workerID)){
+			System.out.println("The worker: " + workerID + " is not exist");
 			return;
 		}
 		String processName = strs[2];
@@ -167,20 +171,14 @@ public class ProcessManager {
 			args[i - 3] = strs[i];
 		}
 		Socket socket = workerToWorkerInfo.get(workerID).getSocket();
-		ObjectOutputStream oos;
+		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(socket.getOutputStream());
-		} catch (IOException e) {
-			System.out.println("Worker: " + workerID + " is failed");
-			System.out.println(e.toString());
-			return;
-		}
-		try {
-			SendCommand sc = new SendCommand(CommandType.START, processName, processIDCounter);
+			SendCommand sc = new SendCommand(CommandType.START, processName, processIDCounter, args);
 			processIDCounter++;
 			oos.writeObject(sc);
-		} catch (Exception e) {
-			System.out.println("Wrong command: start " + workerID + " " + processName);
+		} catch (IOException e) {
+			System.out.println("Worker: " + workerID + " is failed");
 			System.out.println(e.toString());
 			return;
 		} finally{
@@ -210,11 +208,13 @@ public class ProcessManager {
 	}
 
 	private void handleHelpCommand() {
-		System.out.println("help: list all command information");
-		System.out.println("ls: list all workers");
-		System.out.println("ps: list all processes");
-		System.out.println("start WORKERID PROCESSNAME ARG1 ARG2.. : start the process on a worker, the process has arguments arg1, arg2 ...");
-		System.out.println("migrate PROCESSID WORKERID1 WORKERID2: migrate the process from worker1 to worker2");
+		StringBuilder sb = new StringBuilder();
+		sb.append("help: list all command information\n");
+		sb.append("ls: list all workers\n");
+		sb.append("ps: list all processes\n");
+		sb.append("start WORKERID PROCESSNAME ARG1 ARG2.. : start the process on a worker, the process has arguments arg1, arg2 ...\n");
+		sb.append("migrate PROCESSID WORKERID1 WORKERID2: migrate the process from worker1 to worker2");
+		System.out.println(sb);
 	}
 
 	private void startServer(int port) {

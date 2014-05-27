@@ -6,6 +6,7 @@ public class SendCommand {
 	private String processName;
 	private int processIDCounter;
 	private MigratableProcess migratableProcess;
+	private String[] args;
 	
 	public SendCommand(CommandType ct){
 		type = ct;
@@ -18,9 +19,10 @@ public class SendCommand {
 	}
 
 	public SendCommand(CommandType ct, String processName,
-			int processIDCounter) {
+			int processIDCounter, String[] args) {
 		type = ct;
 		this.processName = processName;
 		this.processIDCounter = processIDCounter;
+		this.args = args;
 	}
 }
