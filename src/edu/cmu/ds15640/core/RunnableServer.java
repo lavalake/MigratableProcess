@@ -66,12 +66,15 @@ public class RunnableServer implements Runnable {
 			}
 			break;
 		case "info":
-			StatusType status = replyCommand.getStatus();
-			if(status == StatusType.FINISHED){
-				int processID = replyCommand.getProcessID();
-				ProcessManager.getInstance().updateProcessStatus(processID, status);
-			}
-			break;
+			
+//			TODO array list
+			
+//			StatusType status = replyCommand.getStatus();
+//			if(status == StatusType.FINISHED){
+//				int processID = replyCommand.getProcessID();
+//				ProcessManager.getInstance().updateProcessStatus(processID, status);
+//			}
+//			break;
 		default:
 			System.out.println("Unexpected Command: " + replyCommand.getType().name());
 			break;
