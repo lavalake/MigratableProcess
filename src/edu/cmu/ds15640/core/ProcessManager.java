@@ -19,6 +19,7 @@ public class ProcessManager {
 	private ConcurrentHashMap<Integer, ArrayList<MigratableProcess>> workerToProcesses;
 	private int processIDCounter = 10000;
 	private RunnableServer runnableServer;
+	private RunnableHeartBeat runnableHeartBeat;
 
 	private ProcessManager() {
 		workerToProcesses = new ConcurrentHashMap<Integer, ArrayList<MigratableProcess>>();
@@ -218,8 +219,11 @@ public class ProcessManager {
 
 	private void startServer(int port) {
 		runnableServer = new RunnableServer(port);
-		Thread t = new Thread();
-		t.start();
+		Thread t1 = new Thread(runnableServer);
+		t1.start();
+		runnableHeartBeat = new RunnableHeartBeat();
+		Thread t2 = new Thread(runnableHeartBeat);
+		t2.start();
 	}
 	
 	public void updateProcessStatus(int processID, StatusType status) {
@@ -232,6 +236,7 @@ public class ProcessManager {
 	
 	private void closeManager(){
 		runnableServer.setStop(true);
+		runnableHeartBeat.setStop(true);
 		System.exit(0);
 	}
 
@@ -242,5 +247,4 @@ public class ProcessManager {
 	public ConcurrentHashMap<Integer, ArrayList<MigratableProcess>> getWorkerToProcesses() {
 		return workerToProcesses;
 	}
-
 }
