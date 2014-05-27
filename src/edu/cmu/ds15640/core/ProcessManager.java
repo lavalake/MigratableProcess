@@ -103,17 +103,15 @@ public class ProcessManager {
 			return;
 		}
 		Socket sourceSocket = workerToWorkerInfo.get(sourceWorkerID).getSocket();
-		Socket targetSocket = workerToWorkerInfo.get(targetWorkerID).getSocket();
+		//Socket targetSocket = workerToWorkerInfo.get(targetWorkerID).getSocket();
 		ObjectOutputStream sourceOOS;
-		ObjectOutputStream targetOOS;
-		if(sourceSocket == null || targetSocket == null){
+		//ObjectOutputStream targetOOS;
+		//if(sourceSocket == null){
 			if(sourceSocket == null){
 				System.out.println("the sourceSocketID is not exist: " + sourceWorkerID);
-			}else{
-				System.out.println("the targetSocketID is not exist: " + targetWorkerID);
+				return;
 			}
-			return;
-		}
+		//}
 		try {
 			sourceOOS = new ObjectOutputStream(sourceSocket.getOutputStream());
 			SendCommand migrateCommand = new SendCommand(CommandType.MIGRATE);
@@ -168,7 +166,6 @@ public class ProcessManager {
 			args[i - 3] = strs[i];
 		}
 		Socket socket = workerToWorkerInfo.get(workerID).getSocket();
-		Class processClass;
 		ObjectOutputStream oos;
 		try {
 			oos = new ObjectOutputStream(socket.getOutputStream());
@@ -178,11 +175,8 @@ public class ProcessManager {
 			return;
 		}
 		try {
-			processClass = ProcessManager.class.getClassLoader().loadClass(processName);
-			Constructor constructor = processClass.getConstructor(new Class[]{String[].class});
-			MigratableProcess process = (MigratableProcess) constructor.newInstance(args);
-			process.setProcessID(processIDCounter++);
-			SendCommand sc = new SendCommand(CommandType.START, process);
+			SendCommand sc = new SendCommand(CommandType.START, processName, processIDCounter);
+			processIDCounter++;
 			oos.writeObject(sc);
 		} catch (Exception e) {
 			System.out.println("Wrong command: start " + workerID + " " + processName);
