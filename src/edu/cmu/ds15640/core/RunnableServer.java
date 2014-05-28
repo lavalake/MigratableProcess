@@ -24,7 +24,7 @@ public class RunnableServer implements Runnable {
 			while(!stop){
 				Socket socket = serverSocket.accept();
 				ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-				ReplyCommand replyCommand = (ReplyCommand) ois.readObject();
+				WorkerCommand replyCommand = (WorkerCommand) ois.readObject();
 				handleReply(replyCommand, socket);
 			}
 		} catch (IOException e) {
@@ -38,8 +38,8 @@ public class RunnableServer implements Runnable {
 		}
 	}
 
-	private void handleReply(ReplyCommand replyCommand, Socket socket) {
-		switch (replyCommand.getType().name().toLowerCase()) {
+	private void handleReply(WorkerCommand workerCommand, Socket socket) {
+		switch (workerCommand.getType().name().toLowerCase()) {
 		case "join":
 			String IPAddress = socket.getInetAddress().toString();
 			int port = socket.getPort();
@@ -48,13 +48,13 @@ public class RunnableServer implements Runnable {
 			ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<MigratableProcess>());
 			break;
 		case "migrateto":
-			MigratableProcess process = replyCommand.getMigratableProcess();
-			int workerID = replyCommand.getTargetWorkerID();
+			MigratableProcess process = workerCommand.getMigratableProcess();
+			int workerID = workerCommand.getTargetWorkerID();
 			Socket s = ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getSocket();
 			ObjectOutputStream oos = null;
 			try {
 				oos = new ObjectOutputStream(s.getOutputStream());
-				SendCommand sc = new SendCommand(CommandType.MIGRATESTART, process);
+				MasterCommand sc = new MasterCommand(CommandType.MIGRATESTART, process);
 				oos.writeObject(sc);
 			} catch (IOException e) {
 				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());
@@ -65,7 +65,7 @@ public class RunnableServer implements Runnable {
 				}
 			}
 			break;
-		case "info":
+		case "returninfo":
 			
 //			TODO array list
 			
@@ -76,7 +76,7 @@ public class RunnableServer implements Runnable {
 //			}
 //			break;
 		default:
-			System.out.println("Unexpected Command: " + replyCommand.getType().name());
+			System.out.println("Unexpected Command: " + workerCommand.getType().name());
 			break;
 		}
 	}

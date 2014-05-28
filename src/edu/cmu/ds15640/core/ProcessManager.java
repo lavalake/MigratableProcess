@@ -115,7 +115,7 @@ public class ProcessManager {
 		//}
 		try {
 			sourceOOS = new ObjectOutputStream(sourceSocket.getOutputStream());
-			SendCommand migrateCommand = new SendCommand(CommandType.MIGRATE);
+			MasterCommand migrateCommand = new MasterCommand(CommandType.MIGRATE);
 			sourceOOS.writeObject(migrateCommand);
 		} catch (IOException e) {
 			System.out.println("Worker: " + sourceWorkerID + " is failed");
@@ -174,7 +174,7 @@ public class ProcessManager {
 		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(socket.getOutputStream());
-			SendCommand sc = new SendCommand(CommandType.START, processName, processIDCounter, args);
+			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
 			processIDCounter++;
 			oos.writeObject(sc);
 		} catch (IOException e) {

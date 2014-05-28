@@ -21,7 +21,7 @@ public class ProcessWorker {
 		this.port = port;
 	}
 
-	public void sendToManager(SendCommand sc) {
+	public void sendToManager(MasterCommand sc) {
 		try {
 			oos.writeObject(sc);
 		} catch (IOException e){
@@ -57,7 +57,7 @@ public class ProcessWorker {
 			}
 			
 
-			SendCommand joinCommand = new SendCommand(CommandType.JOIN);
+			MasterCommand joinCommand = new MasterCommand(CommandType.JOIN);
 			worker.sendToManager(joinCommand);
 			
 			System.out.println("Successfully connect to the server");

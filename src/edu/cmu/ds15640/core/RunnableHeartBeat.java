@@ -18,7 +18,7 @@ public class RunnableHeartBeat implements Runnable {
 				ObjectOutputStream oos = null;
 				try {
 					oos = new ObjectOutputStream(socket.getOutputStream());
-					SendCommand sc = new SendCommand(CommandType.GETINFO);
+					MasterCommand sc = new MasterCommand(CommandType.GETINFO);
 					oos.writeObject(sc);
 				} catch (IOException e) {
 					System.out.println("Worker: " + ProcessManager.getInstance().getWorkerToWorkerInfo().get(i).getWorkerID() + " is failed");

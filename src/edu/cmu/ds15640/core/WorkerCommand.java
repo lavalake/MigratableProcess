@@ -2,7 +2,7 @@ package edu.cmu.ds15640.core;
 
 import java.util.ArrayList;
 
-public class ReplyCommand {
+public class WorkerCommand {
 	private CommandType type;
 	private MigratableProcess migratableProcess;
 	//The targetWorkerID is for the target worker the process migrate to
@@ -11,7 +11,7 @@ public class ReplyCommand {
 	//The processID is for the process that has already finished
 	private ArrayList<Integer> processID;
 
-	public ReplyCommand(CommandType type, MigratableProcess mp, int id, ArrayList<StatusType> status, ArrayList<Integer> pID) {
+	public WorkerCommand(CommandType type, MigratableProcess mp, int id, ArrayList<StatusType> status, ArrayList<Integer> pID) {
 		this.type = type;
 		migratableProcess = mp;
 		targetWorkerID = id;

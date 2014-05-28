@@ -1,6 +1,6 @@
 package edu.cmu.ds15640.core;
 
-public class SendCommand {
+public class MasterCommand {
 	
 	private CommandType type;
 	private String processName;
@@ -8,17 +8,17 @@ public class SendCommand {
 	private MigratableProcess migratableProcess;
 	private String[] args;
 	
-	public SendCommand(CommandType ct){
+	public MasterCommand(CommandType ct){
 		type = ct;
 		migratableProcess = null;
 	}
 	
-	public SendCommand(CommandType ct, MigratableProcess mp){
+	public MasterCommand(CommandType ct, MigratableProcess mp){
 		type = ct;
 		migratableProcess = mp;
 	}
 
-	public SendCommand(CommandType ct, String processName,
+	public MasterCommand(CommandType ct, String processName,
 			int processIDCounter, String[] args) {
 		type = ct;
 		this.processName = processName;
