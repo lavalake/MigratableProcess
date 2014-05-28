@@ -125,6 +125,8 @@ public class ProcessWorker {
 			int port = Integer.parseInt(args[1]);
 			ProcessWorker worker = new ProcessWorker(host, port);
 
+			
+			
 			try {
 				worker.socket = new Socket(host, port);
 			} catch (IOException e) {
@@ -133,6 +135,8 @@ public class ProcessWorker {
 				e.printStackTrace();
 			}
 
+			System.out.println("Create socket");
+			
 			try {
 				worker.ois = new ObjectInputStream(
 						worker.socket.getInputStream());
