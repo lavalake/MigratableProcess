@@ -44,8 +44,12 @@ public class WorkerCommand {
 		return migratableProcess;
 	}
 	
-	public ArrayList<StatusType> getStatus(){
+	public ArrayList<StatusType> getStatusList(){
 		return statusList;
+	}
+	
+	public StatusType getStatus(){
+		return status;
 	}
 	
 	public ArrayList<Integer> getProcessID(){

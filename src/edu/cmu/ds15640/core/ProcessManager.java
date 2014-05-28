@@ -174,6 +174,7 @@ public class ProcessManager {
 		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(socket.getOutputStream());
+			//Validate the processName here
 			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
 			processIDCounter++;
 			oos.writeObject(sc);
