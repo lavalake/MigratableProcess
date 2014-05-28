@@ -41,6 +41,7 @@ public class RunnableServer implements Runnable {
 	private void handleReply(WorkerCommand workerCommand, Socket socket) {
 		switch (workerCommand.getType().name().toLowerCase()) {
 		case "join":
+			System.out.println("one worker join");
 			String IPAddress = socket.getInetAddress().toString();
 			int port = socket.getPort();
 			WorkerInfo newWorker = new WorkerInfo(workerID++, IPAddress, port, socket);

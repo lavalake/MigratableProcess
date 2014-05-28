@@ -9,12 +9,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ProcessManager {
 
 	private static int port;
 	private static ProcessManager processManager;
-	private static Lock mutex;
+	private final static Lock mutex = new ReentrantLock();
 	private ConcurrentHashMap<Integer, WorkerInfo> workerToWorkerInfo;
 	private ConcurrentHashMap<Integer, ArrayList<MigratableProcess>> workerToProcesses;
 	private int processIDCounter = 10000;
@@ -193,6 +194,10 @@ public class ProcessManager {
 
 	private void handlePsCommand() {
 		System.out.println("All process information:");
+		if(workerToProcesses.size() == 0){
+			System.out.println("No process information");
+			return;
+		}
 		for (int i : workerToProcesses.keySet()) {
 			System.out.println("Worker " + workerToWorkerInfo.get(i).getWorkerID() + ":");
 			for(int j = 0; j < workerToProcesses.get(i).size(); j++){
@@ -203,6 +208,10 @@ public class ProcessManager {
 
 	private void handleLsCommand() {
 		System.out.println("All worker information:");
+		if(workerToWorkerInfo.size() == 0){
+			System.out.println("No worker information");
+			return;
+		}
 		for (int i : workerToWorkerInfo.keySet()) {
 			System.out.println(workerToWorkerInfo.get(i));
 		}
@@ -210,11 +219,11 @@ public class ProcessManager {
 
 	private void handleHelpCommand() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("help: list all command information\n");
-		sb.append("ls: list all workers\n");
-		sb.append("ps: list all processes\n");
-		sb.append("start WORKERID PROCESSNAME ARG1 ARG2.. : start the process on a worker, the process has arguments arg1, arg2 ...\n");
-		sb.append("migrate PROCESSID WORKERID1 WORKERID2: migrate the process from worker1 to worker2");
+		sb.append("help:    list all command information\n");
+		sb.append("ls:      list all workers\n");
+		sb.append("ps:      list all processes\n");
+		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process on a worker, the process has arguments arg1, arg2 ...\n");
+		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process from worker1 to worker2");
 		System.out.println(sb);
 	}
 
