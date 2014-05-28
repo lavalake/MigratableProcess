@@ -61,45 +61,45 @@ public class ProcessWorker {
 					.getConstructor(new Class[] { String[].class });
 			MigratableProcess process = (MigratableProcess) constructor
 					.newInstance(masterCommand.getArgs());
-			process.setProcessID(masterCommand.getProcessIDCounter());
+			process.setProcessID(masterCommand.getProcessID());
 
 			processList.add(process);
 			pidList.add(process.getProcessID());
-			map.put(masterCommand.getProcessIDCounter(), process);
+			map.put(masterCommand.getProcessID(), process);
 
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.RUNNING);
+					StatusType.RUNNING, masterCommand.getProcessID());
 		} catch (ClassNotFoundException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Process class not found");
 			e.printStackTrace();
 		} catch (SecurityException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Method not found");
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Illegal Argument");
 			e.printStackTrace();
 		} catch (InstantiationException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Illegal Access");
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
-					StatusType.FAIL);
+					StatusType.FAIL, masterCommand.getProcessID());
 			e.printStackTrace();
 		}
 
@@ -114,7 +114,7 @@ public class ProcessWorker {
 	}
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
-		 MigratableProcess mp = map.get(masterCommand.getProcessIDCounter());
+		 MigratableProcess mp = map.get(masterCommand.getProcessID());
 		 WorkerCommand migrateCommand = new WorkerCommand (CommandType.MIGRATETO, mp);
 		 sendToManager(migrateCommand);
 	}
@@ -128,6 +128,7 @@ public class ProcessWorker {
 			try {
 				worker.socket = new Socket(host, port);
 			} catch (IOException e) {
+				worker.stop = true;
 				System.err.println("cannot create socket");
 				e.printStackTrace();
 			}
@@ -138,6 +139,7 @@ public class ProcessWorker {
 				worker.oos = new ObjectOutputStream(
 						worker.socket.getOutputStream());
 			} catch (IOException e) {
+				worker.stop = true;
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}

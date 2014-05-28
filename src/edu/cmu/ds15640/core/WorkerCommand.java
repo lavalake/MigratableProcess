@@ -8,6 +8,7 @@ public class WorkerCommand {
 	//The targetWorkerID is for the target worker the process migrate to
 	private int targetWorkerID;
 	private StatusType status;
+	private int processId;
 	private ArrayList<StatusType> statusList;
 	//The processID is for the process that has already finished
 	private ArrayList<Integer> pidList;
@@ -17,9 +18,10 @@ public class WorkerCommand {
 		this.migratableProcess = null;
 	}
 	
-	public WorkerCommand(CommandType ct, StatusType status) {
+	public WorkerCommand(CommandType ct, StatusType status, int pid) {
 		this.type = ct;
 		this.status = status;
+		this.processId = pid;
 	}
 
 	public WorkerCommand (CommandType ct, ArrayList<StatusType> status, ArrayList<Integer> pID) {
@@ -56,5 +58,9 @@ public class WorkerCommand {
 	
 	public int getTargetWorkerID(){
 		return targetWorkerID;
+	}
+
+	public int getProcessId() {
+		return processId;
 	}
 }

@@ -4,7 +4,7 @@ public class MasterCommand {
 	
 	private CommandType type;
 	private String processName;
-	private int processIDCounter;
+	private int processID;
 	private MigratableProcess migratableProcess;
 	private String[] args;
 	
@@ -22,7 +22,7 @@ public class MasterCommand {
 			int processIDCounter, String[] args) {
 		type = ct;
 		this.processName = processName;
-		this.processIDCounter = processIDCounter;
+		this.processID = processIDCounter;
 		this.args = args;
 	}
 	
@@ -34,8 +34,8 @@ public class MasterCommand {
 		return processName;
 	}
 
-	public int getProcessIDCounter() {
-		return processIDCounter;
+	public int getProcessID() {
+		return processID;
 	}
 
 	public MigratableProcess getMigratableProcess() {
