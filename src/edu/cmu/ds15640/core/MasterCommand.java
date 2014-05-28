@@ -25,4 +25,26 @@ public class MasterCommand {
 		this.processIDCounter = processIDCounter;
 		this.args = args;
 	}
+	
+	public CommandType getType() {
+		return type;
+	}
+
+	public String getProcessName() {
+		return processName;
+	}
+
+	public int getProcessIDCounter() {
+		return processIDCounter;
+	}
+
+	public MigratableProcess getMigratableProcess() {
+		return migratableProcess;
+	}
+
+	public String[] getArgs() {
+		return args;
+	}
+	
+	
 }

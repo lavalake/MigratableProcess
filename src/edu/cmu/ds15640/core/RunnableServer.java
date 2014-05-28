@@ -24,8 +24,8 @@ public class RunnableServer implements Runnable {
 			while(!stop){
 				Socket socket = serverSocket.accept();
 				ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-				WorkerCommand replyCommand = (WorkerCommand) ois.readObject();
-				handleReply(replyCommand, socket);
+				WorkerCommand workerCommand = (WorkerCommand) ois.readObject();
+				handleReply(workerCommand, socket);
 			}
 		} catch (IOException e) {
 			System.out.println("Unexpected IOException");
