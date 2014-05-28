@@ -125,8 +125,6 @@ public class ProcessWorker {
 			int port = Integer.parseInt(args[1]);
 			ProcessWorker worker = new ProcessWorker(host, port);
 
-			
-			
 			try {
 				worker.socket = new Socket(host, port);
 			} catch (IOException e) {
@@ -136,10 +134,9 @@ public class ProcessWorker {
 			}
 
 			System.out.println("Create socket");
-			
+						
 			try {
-				worker.ois = new ObjectInputStream(
-						worker.socket.getInputStream());
+//				
 				worker.oos = new ObjectOutputStream(
 						worker.socket.getOutputStream());
 			} catch (IOException e) {
@@ -147,13 +144,22 @@ public class ProcessWorker {
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-
+			
 			WorkerCommand joinCommand = new WorkerCommand(CommandType.JOIN);
 			worker.sendToManager(joinCommand);
 
 			System.out.println("Successfully connect to the server");
 
+			
 			while (!worker.stop) {
+				
+				try {
+					worker.ois = new ObjectInputStream(worker.socket.getInputStream());
+				} catch (IOException e) {
+					System.err.println("Cannot create input stream");
+					e.printStackTrace();
+				}
+				
 				MasterCommand masterCommand = worker.receiveFromManager();
 				switch (masterCommand.getType().name().toLowerCase()) {
 				case "start":

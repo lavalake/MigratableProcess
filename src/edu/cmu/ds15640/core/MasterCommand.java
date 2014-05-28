@@ -1,6 +1,8 @@
 package edu.cmu.ds15640.core;
 
-public class MasterCommand {
+import java.io.Serializable;
+
+public class MasterCommand implements Serializable {
 	
 	private CommandType type;
 	private String processName;

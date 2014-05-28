@@ -1,8 +1,9 @@
 package edu.cmu.ds15640.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class WorkerCommand {
+public class WorkerCommand implements Serializable {
 	private CommandType type;
 	private MigratableProcess migratableProcess;
 	//The targetWorkerID is for the target worker the process migrate to
