@@ -23,16 +23,16 @@ public class RunnableServer implements Runnable {
 			ServerSocket serverSocket = new ServerSocket(port);
 			while(!stop){
 				Socket socket = serverSocket.accept();
-				ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-				WorkerCommand workerCommand = (WorkerCommand) ois.readObject();
-				handleReply(workerCommand, socket);
+				String IPAddress = socket.getInetAddress().toString();
+				int port = socket.getPort();
+				WorkerInfo newWorker = new WorkerInfo(workerID++, IPAddress, port, socket);
+				ProcessManager.getInstance().getWorkerToWorkerInfo().put(newWorker.getWorkerID(), newWorker);
+				ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<MigratableProcess>());
+				workerServiceThread thread = new workerServiceThread(socket);
+				thread.start();
 			}
 		} catch (IOException e) {
 			System.out.println("Unexpected IOException");
-			e.printStackTrace();
-			System.exit(0);
-		} catch (ClassNotFoundException e) {
-			System.out.println("Unexpected Class!");
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -97,4 +97,31 @@ public class RunnableServer implements Runnable {
 		stop = s;
 	}
 	
+	public class workerServiceThread extends Thread{
+		Socket s;
+		ObjectInputStream ois;
+		ObjectOutputStream oos;
+		
+		public workerServiceThread(Socket socket) {
+			s = socket;
+			try {
+				ois = new ObjectInputStream(s.getInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void run(){
+			while(true){
+				WorkerCommand workerCommand;
+				try {
+					workerCommand = (WorkerCommand) ois.readObject();
+					System.out.println("read something");
+					handleReply(workerCommand, s);
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

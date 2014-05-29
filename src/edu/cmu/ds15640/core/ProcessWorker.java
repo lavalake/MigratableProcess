@@ -44,6 +44,8 @@ public class ProcessWorker {
 	private MasterCommand receiveFromManager() {
 		MasterCommand masterCommand = null;
 		try {
+			System.out.println("Try to read from server");
+			System.out.println(ois);
 			masterCommand = (MasterCommand) ois.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("Cannot read from master");
@@ -136,7 +138,9 @@ public class ProcessWorker {
 			System.out.println("Create socket");
 						
 			try {
-//				
+				System.out.println("Create inputStream");
+				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
+				System.out.println("Create inputStream!!!!");
 				worker.oos = new ObjectOutputStream(
 						worker.socket.getOutputStream());
 			} catch (IOException e) {
@@ -149,26 +153,26 @@ public class ProcessWorker {
 			worker.sendToManager(joinCommand);
 
 			System.out.println("Successfully connect to the server");
-
+			/*try {
+				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
+			} catch (IOException e) {
+				System.err.println("Cannot create input stream");
+				e.printStackTrace();
+			}*/
 			
 			while (!worker.stop) {
-				
-				try {
-					worker.ois = new ObjectInputStream(worker.socket.getInputStream());
-				} catch (IOException e) {
-					System.err.println("Cannot create input stream");
-					e.printStackTrace();
-				}
-				
 				MasterCommand masterCommand = worker.receiveFromManager();
 				switch (masterCommand.getType().name().toLowerCase()) {
 				case "start":
+					System.out.println("start");
 					worker.handleStartCommand(masterCommand);
 					break;
 				case "info":
+					System.out.println("info");
 					worker.handleInfoCommand();
 					break;
 				case "migrate":
+					System.out.println("migrate");
 					worker.handleMigrateCommand(masterCommand);
 					break;
 				}

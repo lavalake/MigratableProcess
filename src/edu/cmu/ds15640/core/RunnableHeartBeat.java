@@ -13,6 +13,7 @@ public class RunnableHeartBeat implements Runnable {
 	@Override
 	public void run() {
 		while(!stop){
+			System.out.println("Send heart beat information");
 			for(int i: ProcessManager.getInstance().getWorkerToWorkerInfo().keySet()){
 				Socket socket = ProcessManager.getInstance().getWorkerToWorkerInfo().get(i).getSocket();
 				ObjectOutputStream oos = null;
