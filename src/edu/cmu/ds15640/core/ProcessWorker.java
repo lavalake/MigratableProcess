@@ -152,7 +152,7 @@ public class ProcessWorker {
 				e.printStackTrace();
 			}
 
-			while (!worker.stop) {
+			//while (!worker.stop) {
 				try {
 					System.out.println("");
 					MasterCommand masterCommand = (MasterCommand) worker.ois
@@ -179,7 +179,7 @@ public class ProcessWorker {
 				} catch (ClassNotFoundException e) {
 					System.err.println("class not found");
 				}
-			}
+			//}
 				
 				
 			try {

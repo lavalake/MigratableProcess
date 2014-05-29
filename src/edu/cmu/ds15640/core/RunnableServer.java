@@ -1,6 +1,7 @@
 package edu.cmu.ds15640.core;
 
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -107,6 +108,7 @@ public class RunnableServer implements Runnable {
 			s = socket;
 			try {
 				ois = new ObjectInputStream(s.getInputStream());
+				oos = new ObjectOutputStream(s.getOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -116,6 +118,8 @@ public class RunnableServer implements Runnable {
 			while(!stop){
 				WorkerCommand workerCommand;
 				try {
+					System.out.println("start reading");
+					//System.out.println((String)ois.readObject());
 					workerCommand = (WorkerCommand) ois.readObject();
 					System.out.println("read something");
 					handleReply(workerCommand, s);
