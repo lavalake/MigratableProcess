@@ -45,9 +45,11 @@ public class ProcessWorker {
 		MasterCommand masterCommand = null;
 		try {
 			masterCommand = (MasterCommand) ois.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			System.err.println("Cannot read from master");
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.err.println("class not found");
 		}
 		return masterCommand;
 	}
@@ -135,42 +137,34 @@ public class ProcessWorker {
 
 			System.out.println("Create socket");
 						
-			try {
-//				
-				worker.oos = new ObjectOutputStream(
-						worker.socket.getOutputStream());
+			try {			
+				worker.oos = new ObjectOutputStream(worker.socket.getOutputStream());		
+				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-			
-			WorkerCommand joinCommand = new WorkerCommand(CommandType.JOIN);
-			worker.sendToManager(joinCommand);
-
-			System.out.println("Successfully connect to the server");
-
-			
+				
 			while (!worker.stop) {
-				
 				try {
-					worker.ois = new ObjectInputStream(worker.socket.getInputStream());
+					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
+					switch (masterCommand.getType().name().toLowerCase()) {
+					case "start":
+						worker.handleStartCommand(masterCommand);
+						break;
+					case "info":
+						worker.handleInfoCommand();
+						break;
+					case "migrate":
+						worker.handleMigrateCommand(masterCommand);
+						break;
+					}
 				} catch (IOException e) {
-					System.err.println("Cannot create input stream");
+					System.err.println("Cannot read from master");
 					e.printStackTrace();
-				}
-				
-				MasterCommand masterCommand = worker.receiveFromManager();
-				switch (masterCommand.getType().name().toLowerCase()) {
-				case "start":
-					worker.handleStartCommand(masterCommand);
-					break;
-				case "info":
-					worker.handleInfoCommand();
-					break;
-				case "migrate":
-					worker.handleMigrateCommand(masterCommand);
-					break;
+				} catch (ClassNotFoundException e) {
+					System.err.println("class not found");
 				}
 			}
 			try {
