@@ -151,7 +151,8 @@ public class ProcessManager {
 			System.out.println(e.toString());
 			return;
 		}
-		if(!workerToWorkerInfo.contains(workerID)){
+		
+		if(!workerToWorkerInfo.keySet().contains(workerID)){
 			System.out.println("The worker: " + workerID + " is not exist");
 			return;
 		}

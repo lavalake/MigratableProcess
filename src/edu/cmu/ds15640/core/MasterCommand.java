@@ -30,10 +30,10 @@ public class MasterCommand implements Serializable {
 	}
 
 	public MasterCommand(CommandType ct, String processName,
-			int processIDCounter, String[] args) {
+			int processID, String[] args) {
 		type = ct;
 		this.processName = processName;
-		this.processID = processIDCounter;
+		this.processID = processID;
 		this.args = args;
 	}
 	

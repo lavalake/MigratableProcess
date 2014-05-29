@@ -38,7 +38,6 @@ public class ProcessWorker {
 	private void sendToManager(WorkerCommand sc) {
 		try {
 			oos.writeObject(sc);
-			System.out.println("write success");
 		} catch (IOException e) {
 			System.err.println("fail to send manager");
 		}
@@ -62,10 +61,13 @@ public class ProcessWorker {
 		try {
 			processClass = ProcessWorker.class.getClassLoader().loadClass(
 					masterCommand.getProcessName());
-			Constructor constructor = processClass
-					.getConstructor(new Class[] { String[].class });
-			MigratableProcess process = (MigratableProcess) constructor
-					.newInstance(masterCommand.getArgs());
+			
+			Constructor constructor = processClass.getConstructor(new Class[] { String[].class });
+			
+			System.out.println(masterCommand.getArgs().length);
+			
+			MigratableProcess process = (MigratableProcess) constructor.newInstance(masterCommand.getArgs());
+			
 			process.setProcessID(masterCommand.getProcessID());
 
 			processList.add(process);
@@ -126,6 +128,18 @@ public class ProcessWorker {
 	}
 
 	public static void main(String[] args) {
+		
+		/*********/
+		
+		ProcessWorker worker = new ProcessWorker("localhost", 8888);
+		String[] arr = {"CHAPTER", "lifeofjesus.txt", "empty.txt"};
+		MasterCommand mc = new MasterCommand(CommandType.START, "edu.cmu.ds15640.core.GrepProcess", 1001, arr);
+		worker.handleStartCommand(mc);
+		
+		/*********/
+		
+		
+	/*
 		if (args.length == 2) {
 			String host = args[0];
 			int port = Integer.parseInt(args[1]);
@@ -164,7 +178,6 @@ public class ProcessWorker {
 						break;
 					case "getinfo":
 						worker.handleInfoCommand();
-						System.out.println("getinfo");
 						break;
 					case "migrate":
 						worker.handleMigrateCommand(masterCommand);
@@ -194,6 +207,6 @@ public class ProcessWorker {
 		} else {
 			System.out.println("Please enter the host ip and port number");
 		}
-
+    */
 	}
 }
