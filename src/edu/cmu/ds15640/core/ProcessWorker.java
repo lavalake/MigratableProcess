@@ -61,12 +61,9 @@ public class ProcessWorker {
 		try {
 			processClass = ProcessWorker.class.getClassLoader().loadClass(
 					masterCommand.getProcessName());
-			
-			Constructor constructor = processClass.getConstructor(new Class[] { String[].class });
-			
-			System.out.println(masterCommand.getArgs().length);
-			
-			MigratableProcess process = (MigratableProcess) constructor.newInstance(masterCommand.getArgs());
+			Constructor constructor = processClass.getConstructor(String[].class);
+			Object[] passed = {masterCommand.getArgs()};
+			MigratableProcess process = (MigratableProcess) constructor.newInstance(passed);
 			
 			process.setProcessID(masterCommand.getProcessID());
 

@@ -101,11 +101,11 @@ public class ProcessManager {
 			System.out.println(e.toString());
 			return;
 		}
-		if(!workerToWorkerInfo.contains(sourceWorkerID)){
+		if(!workerToWorkerInfo.containsKey(sourceWorkerID)){
 			System.out.println("The source worker: " + sourceWorkerID + " is not exist");
 			return;
 		}
-		if(!workerToWorkerInfo.contains(targetWorkerID)){
+		if(!workerToWorkerInfo.containsKey(targetWorkerID)){
 			System.out.println("The target worker: " + targetWorkerID + " is not exist");
 			return;
 		}
@@ -152,7 +152,7 @@ public class ProcessManager {
 			return;
 		}
 		
-		if(!workerToWorkerInfo.keySet().contains(workerID)){
+		if(!workerToWorkerInfo.containsKey(workerID)){
 			System.out.println("The worker: " + workerID + " is not exist");
 			return;
 		}
