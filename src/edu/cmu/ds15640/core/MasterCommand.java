@@ -9,10 +9,15 @@ public class MasterCommand implements Serializable {
 	 */
 	private static final long serialVersionUID = -2245667253840915290L;
 	private CommandType type;
-	private String processName;
+	//ProcessID is for the getinfo
 	private int processID;
+	//migratableProcess is for migrateTo
 	private MigratableProcess migratableProcess;
+	//processName and args are for start
+	private String processName;
 	private String[] args;
+	//targetWorker is for migrate
+	private int targetWorkerID;
 	
 	public MasterCommand(CommandType ct){
 		type = ct;
@@ -32,6 +37,12 @@ public class MasterCommand implements Serializable {
 		this.args = args;
 	}
 	
+	public MasterCommand(CommandType ct, int targetWorkerID, int processID) {
+		type = ct;
+		this.targetWorkerID = targetWorkerID;
+		this.processID = processID;
+	}
+
 	public CommandType getType() {
 		return type;
 	}

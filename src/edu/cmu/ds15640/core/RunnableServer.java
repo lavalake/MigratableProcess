@@ -1,9 +1,6 @@
 package edu.cmu.ds15640.core;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,115 +21,24 @@ public class RunnableServer implements Runnable {
 			ServerSocket serverSocket = new ServerSocket(port);
 			while(!stop){
 				Socket socket = serverSocket.accept();
+				System.out.println("one worker joins");
 				String IPAddress = socket.getInetAddress().toString();
 				int port = socket.getPort();
-				WorkerInfo newWorker = new WorkerInfo(workerID++, IPAddress, port, socket);
+				WorkerService workerService = new WorkerService(socket, workerID);
+				WorkerInfo newWorker = new WorkerInfo(workerID, IPAddress, port, workerService);
+				workerID++;
 				ProcessManager.getInstance().getWorkerToWorkerInfo().put(newWorker.getWorkerID(), newWorker);
 				ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<MigratableProcess>());
-				workerServiceThread thread = new workerServiceThread(socket);
-				thread.start();
+				workerService.start();
 			}
 		} catch (IOException e) {
-			System.out.println("Unexpected IOException");
+			System.out.println("Server Network Exception");
 			e.printStackTrace();
-			System.exit(0);
+			ProcessManager.getInstance().closeManager();
 		}
 	}
 
-	private void handleReply(WorkerCommand workerCommand, Socket socket) {
-		switch (workerCommand.getType().name().toLowerCase()) {
-		case "join":
-			System.out.println("one worker join");
-			String IPAddress = socket.getInetAddress().toString();
-			int port = socket.getPort();
-			WorkerInfo newWorker = new WorkerInfo(workerID++, IPAddress, port, socket);
-			ProcessManager.getInstance().getWorkerToWorkerInfo().put(newWorker.getWorkerID(), newWorker);
-			ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<MigratableProcess>());
-			break;
-		case "migrateto":
-			MigratableProcess process = workerCommand.getMigratableProcess();
-			int workerID = workerCommand.getTargetWorkerID();
-			Socket s = ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getSocket();
-			ObjectOutputStream oos = null;
-			try {
-				oos = new ObjectOutputStream(s.getOutputStream());
-				MasterCommand sc = new MasterCommand(CommandType.MIGRATESTART, process);
-				oos.writeObject(sc);
-			} catch (IOException e) {
-				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());
-			} finally{
-				try {
-					oos.close();
-				} catch (IOException e) {
-				}
-			}
-			break;
-		case "returninfo":
-			ArrayList<Integer> processes = workerCommand.getProcessID();
-			ArrayList<StatusType> statuses = workerCommand.getStatusList();
-			for(int i = 0; i < processes.size(); i++){
-				if(statuses.get(i) == StatusType.FINISHED){
-					int processID = processes.get(i);
-					ProcessManager.getInstance().updateProcessStatus(processID, StatusType.FINISHED);
-				}else if(statuses.get(i) == StatusType.FAIL){
-					int processID = processes.get(i);
-					ProcessManager.getInstance().updateProcessStatus(processID, StatusType.FAIL);
-				}
-			}
-			break;
-		case "startreturn":
-			int processID = workerCommand.getProcessId();
-			StatusType st = workerCommand.getStatus();
-			if(st == StatusType.FAIL){
-				ProcessManager.getInstance().updateProcessStatus(processID, StatusType.FAIL);
-				System.out.println("The process: " + processID + " fails to start");
-			}
-			break;
-		default:
-			System.out.println("Unexpected Command: " + workerCommand.getType().name());
-			break;
-		}
-	}
-
-	public void setStop(boolean s){
-		stop = s;
-	}
-	
-	public class workerServiceThread extends Thread{
-		Socket s;
-		ObjectInputStream ois;
-		ObjectOutputStream oos;
-		boolean stop = false;
-		
-		public workerServiceThread(Socket socket) {
-			s = socket;
-			try {
-				ois = new ObjectInputStream(s.getInputStream());
-				oos = new ObjectOutputStream(s.getOutputStream());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		public void run(){
-			while(!stop){
-				WorkerCommand workerCommand;
-				try {
-					
-					//MasterCommand sc = new MasterCommand(CommandType.GETINFO);
-					//oos.writeObject(sc);
-					//System.out.println((String)ois.readObject());
-					System.out.println("start reading");
-					Object tmp = ois.readObject();
-					System.out.println(tmp.toString());
-					workerCommand = (WorkerCommand) tmp;
-					System.out.println("read something");
-					handleReply(workerCommand, s);
-				} catch (ClassNotFoundException | IOException e) {
-					e.printStackTrace();
-					stop = true;
-				}
-			}
-		}
+	public void stopServer(){
+		stop = true;
 	}
 }

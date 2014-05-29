@@ -1,9 +1,6 @@
 package edu.cmu.ds15640.core;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import javax.management.timer.Timer;
 
 public class RunnableHeartBeat implements Runnable {
@@ -13,24 +10,16 @@ public class RunnableHeartBeat implements Runnable {
 	@Override
 	public void run() {
 		while(!stop){
-			System.out.println("Send heart beat information");
-			for(int i: ProcessManager.getInstance().getWorkerToWorkerInfo().keySet()){
-				Socket socket = ProcessManager.getInstance().getWorkerToWorkerInfo().get(i).getSocket();
-				ObjectOutputStream oos = null;
+			//System.out.println("Send heart beat information");
+			for(int id: ProcessManager.getInstance().getWorkerToWorkerInfo().keySet()){
 				try {
-					oos = new ObjectOutputStream(socket.getOutputStream());
 					MasterCommand sc = new MasterCommand(CommandType.GETINFO);
-					oos.writeObject(sc);
+					ProcessManager.getInstance().getWorkerToWorkerInfo().get(id).getWorkerService().writeToWorker(sc);
 				} catch (IOException e) {
-					System.out.println("Worker: " + ProcessManager.getInstance().getWorkerToWorkerInfo().get(i).getWorkerID() + " is failed");
+					System.out.println("Worker: " + ProcessManager.getInstance().getWorkerToWorkerInfo().get(id).getWorkerID() + " is failed");
 					System.out.println(e.toString());
+					ProcessManager.getInstance().getWorkerToWorkerInfo().get(id).getWorkerService().stopWorker(id);
 					return;
-				} finally{
-					try {
-						oos.close();
-					} catch (IOException e) {
-						System.out.println(e.toString());
-					}
 				}
 			}
 			try {
@@ -41,7 +30,7 @@ public class RunnableHeartBeat implements Runnable {
 		}
 	}
 	
-	public void setStop(boolean bool){
-		stop = bool;
+	public void stopHeartBeat(){
+		stop = true;
 	}
 }

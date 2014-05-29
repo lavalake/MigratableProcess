@@ -3,9 +3,6 @@ package edu.cmu.ds15640.core;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Constructor;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -104,39 +101,31 @@ public class ProcessManager {
 			System.out.println(e.toString());
 			return;
 		}
-		Socket sourceSocket = workerToWorkerInfo.get(sourceWorkerID).getSocket();
-		//Socket targetSocket = workerToWorkerInfo.get(targetWorkerID).getSocket();
-		ObjectOutputStream sourceOOS;
-		//ObjectOutputStream targetOOS;
-		//if(sourceSocket == null){
-			if(sourceSocket == null){
-				System.out.println("the sourceSocketID is not exist: " + sourceWorkerID);
-				return;
-			}
-		//}
+		if(!workerToWorkerInfo.contains(sourceWorkerID)){
+			System.out.println("The source worker: " + sourceWorkerID + " is not exist");
+			return;
+		}
+		if(!workerToWorkerInfo.contains(targetWorkerID)){
+			System.out.println("The target worker: " + targetWorkerID + " is not exist");
+			return;
+		}
+		if(getProcessWithID(processID) == null){
+			System.out.println("The processID: " + processID + " is not exist");
+			return;
+		}
 		try {
-			sourceOOS = new ObjectOutputStream(sourceSocket.getOutputStream());
-			MasterCommand migrateCommand = new MasterCommand(CommandType.MIGRATE);
-			sourceOOS.writeObject(migrateCommand);
+			MasterCommand migrateCommand = new MasterCommand(CommandType.MIGRATE, targetWorkerID, processID);
+			workerToWorkerInfo.get(sourceWorkerID).getWorkerService().writeToWorker(migrateCommand);
 		} catch (IOException e) {
 			System.out.println("Worker: " + sourceWorkerID + " is failed");
 			System.out.println(e.toString());
+			RemoveWorker(sourceWorkerID);
 			return;
 		}
-		/*if we send the migrate command directly to the source worker, we don't need to test the target worker here
-		try {
-			targetOOS = new ObjectOutputStream(targetSocket.getOutputStream());
-		} catch (IOException e) {
-			System.out.println("Socket IOException with worker: " + targetWorkerID);
-			System.out.println(e.toString());
-			return;
-		}
-		MigratableProcess mp = getProcessWithID(processID);
-		if(mp == null){
-			System.out.println("Cannot find the process with processID: " + processID);
-			return;
-		}
-		*/
+	}
+
+	private void RemoveWorker(int workerID) {
+		workerToWorkerInfo.get(workerID).getWorkerService().stopWorker(workerID);
 	}
 
 	private MigratableProcess getProcessWithID(int processID) {
@@ -171,24 +160,16 @@ public class ProcessManager {
 		for(int i = 3; i < strs.length; i++){
 			args[i - 3] = strs[i];
 		}
-		Socket socket = workerToWorkerInfo.get(workerID).getSocket();
-		ObjectOutputStream oos = null;
 		try {
-			oos = new ObjectOutputStream(socket.getOutputStream());
 			//Validate the processName here
 			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
 			processIDCounter++;
-			oos.writeObject(sc);
+			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
 			System.out.println(e.toString());
+			RemoveWorker(workerID);
 			return;
-		} finally{
-			try {
-				oos.close();
-			} catch (IOException e) {
-				System.out.println(e.toString());
-			}
 		}
 	}
 
@@ -222,8 +203,8 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
-		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process on a worker, the process has arguments arg1, arg2 ...\n");
-		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process from worker1 to worker2");
+		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
+		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
 		System.out.println(sb);
 	}
 
@@ -244,9 +225,9 @@ public class ProcessManager {
 		mp.setStatus(status);
 	}
 	
-	private void closeManager(){
-		runnableServer.setStop(true);
-		runnableHeartBeat.setStop(true);
+	public void closeManager(){
+		runnableServer.stopServer();
+		runnableHeartBeat.stopHeartBeat();
 		System.exit(0);
 	}
 

@@ -1,18 +1,16 @@
 package edu.cmu.ds15640.core;
 
-import java.net.Socket;
-
 public class WorkerInfo {
 	private int workerID;
 	private String IPAddress;
 	private int port;
-	private Socket socket;
+	private WorkerService workerService;
 
-	public WorkerInfo(int id, String ip, int p, Socket s) {
+	public WorkerInfo(int id, String ip, int p, WorkerService ws) {
 		workerID = id;
 		IPAddress = ip;
 		port = p;
-		socket = s;
+		workerService = ws;
 	}
 
 	public int getWorkerID() {
@@ -23,11 +21,12 @@ public class WorkerInfo {
 		return IPAddress;
 	}
 
-	public Socket getSocket() {
-		return socket;
+	public WorkerService getWorkerService() {
+		return workerService;
 	}
 
 	public String toString() {
-		return new String("workerID: " + workerID + "	IPAddress: " + IPAddress + "	Port: " + port);
+		return new String("workerID: " + workerID + "	IPAddress: " + IPAddress
+				+ "	Port: " + port);
 	}
 }
