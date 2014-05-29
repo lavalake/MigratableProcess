@@ -44,12 +44,12 @@ public class ProcessWorker {
 	private MasterCommand receiveFromManager() {
 		MasterCommand masterCommand = null;
 		try {
-			System.out.println("Try to read from server");
-			System.out.println(ois);
 			masterCommand = (MasterCommand) ois.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			System.err.println("Cannot read from master");
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.err.println("class not found");
 		}
 		return masterCommand;
 	}
@@ -137,44 +137,34 @@ public class ProcessWorker {
 
 			System.out.println("Create socket");
 						
-			try {
-				System.out.println("Create inputStream");
+			try {			
+				worker.oos = new ObjectOutputStream(worker.socket.getOutputStream());		
 				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
-				System.out.println("Create inputStream!!!!");
-				worker.oos = new ObjectOutputStream(
-						worker.socket.getOutputStream());
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-			
-			WorkerCommand joinCommand = new WorkerCommand(CommandType.JOIN);
-			worker.sendToManager(joinCommand);
-
-			System.out.println("Successfully connect to the server");
-			/*try {
-				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
-			} catch (IOException e) {
-				System.err.println("Cannot create input stream");
-				e.printStackTrace();
-			}*/
-			
+				
 			while (!worker.stop) {
-				MasterCommand masterCommand = worker.receiveFromManager();
-				switch (masterCommand.getType().name().toLowerCase()) {
-				case "start":
-					System.out.println("start");
-					worker.handleStartCommand(masterCommand);
-					break;
-				case "info":
-					System.out.println("info");
-					worker.handleInfoCommand();
-					break;
-				case "migrate":
-					System.out.println("migrate");
-					worker.handleMigrateCommand(masterCommand);
-					break;
+				try {
+					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
+					switch (masterCommand.getType().name().toLowerCase()) {
+					case "start":
+						worker.handleStartCommand(masterCommand);
+						break;
+					case "info":
+						worker.handleInfoCommand();
+						break;
+					case "migrate":
+						worker.handleMigrateCommand(masterCommand);
+						break;
+					}
+				} catch (IOException e) {
+					System.err.println("Cannot read from master");
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					System.err.println("class not found");
 				}
 			}
 			try {
