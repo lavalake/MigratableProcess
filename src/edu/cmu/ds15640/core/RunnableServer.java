@@ -118,9 +118,14 @@ public class RunnableServer implements Runnable {
 			while(!stop){
 				WorkerCommand workerCommand;
 				try {
-					System.out.println("start reading");
+					
+					//MasterCommand sc = new MasterCommand(CommandType.GETINFO);
+					//oos.writeObject(sc);
 					//System.out.println((String)ois.readObject());
-					workerCommand = (WorkerCommand) ois.readObject();
+					System.out.println("start reading");
+					Object tmp = ois.readObject();
+					System.out.println(tmp.toString());
+					workerCommand = (WorkerCommand) tmp;
 					System.out.println("read something");
 					handleReply(workerCommand, s);
 				} catch (ClassNotFoundException | IOException e) {

@@ -153,7 +153,6 @@ public class ProcessWorker {
 			}
 			
 			
-			
 			while (!worker.stop) {
 				try {
 					
