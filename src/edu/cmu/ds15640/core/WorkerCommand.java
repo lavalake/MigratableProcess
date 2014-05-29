@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class WorkerCommand implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2215252029261060551L;
 	private CommandType type;
 	private MigratableProcess migratableProcess;
 	//The targetWorkerID is for the target worker the process migrate to
