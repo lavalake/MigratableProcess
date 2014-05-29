@@ -31,13 +31,16 @@ public class ProcessWorker {
 	public ProcessWorker(String host, int port) {
 		this.host = host;
 		this.port = port;
+		this.statusList = new ArrayList<StatusType>();
+		this.pidList = new ArrayList<Integer>();
 	}
 
 	private void sendToManager(WorkerCommand sc) {
 		try {
 			oos.writeObject(sc);
+			System.out.println("write success");
 		} catch (IOException e) {
-
+			System.err.println("fail to send manager");
 		}
 	}
 
@@ -116,9 +119,10 @@ public class ProcessWorker {
 	}
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
-		 MigratableProcess mp = map.get(masterCommand.getProcessID());
-		 WorkerCommand migrateCommand = new WorkerCommand (CommandType.MIGRATETO, mp);
-		 sendToManager(migrateCommand);
+		MigratableProcess mp = map.get(masterCommand.getProcessID());
+		WorkerCommand migrateCommand = new WorkerCommand(CommandType.MIGRATETO,
+				mp);
+		sendToManager(migrateCommand);
 	}
 
 	public static void main(String[] args) {
@@ -136,28 +140,37 @@ public class ProcessWorker {
 			}
 
 			System.out.println("Create socket");
-						
-			try {			
-				worker.oos = new ObjectOutputStream(worker.socket.getOutputStream());		
-				worker.ois = new ObjectInputStream(worker.socket.getInputStream());
+
+			try {
+				worker.oos = new ObjectOutputStream(
+						worker.socket.getOutputStream());
+				worker.ois = new ObjectInputStream(
+						worker.socket.getInputStream());
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-				
+
 			while (!worker.stop) {
 				try {
-					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
+					System.out.println("");
+					MasterCommand masterCommand = (MasterCommand) worker.ois
+							.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
 					case "start":
 						worker.handleStartCommand(masterCommand);
 						break;
-					case "info":
+					case "getinfo":
 						worker.handleInfoCommand();
+						System.out.println("getinfo");
 						break;
 					case "migrate":
 						worker.handleMigrateCommand(masterCommand);
+						break;
+					default:
+						System.out.println("Wrong command: "
+								+ masterCommand.getType().name());
 						break;
 					}
 				} catch (IOException e) {
@@ -167,6 +180,8 @@ public class ProcessWorker {
 					System.err.println("class not found");
 				}
 			}
+				
+				
 			try {
 				worker.oos.close();
 				worker.ois.close();
