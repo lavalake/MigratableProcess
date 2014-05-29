@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class MasterCommand implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2245667253840915290L;
 	private CommandType type;
 	private String processName;
 	private int processID;

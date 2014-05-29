@@ -151,10 +151,12 @@ public class ProcessWorker {
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-
-			//while (!worker.stop) {
+			
+			
+			
+			while (!worker.stop) {
 				try {
-					System.out.println("");
+					
 					MasterCommand masterCommand = (MasterCommand) worker.ois
 							.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
@@ -179,7 +181,7 @@ public class ProcessWorker {
 				} catch (ClassNotFoundException e) {
 					System.err.println("class not found");
 				}
-			//}
+			}
 				
 				
 			try {
