@@ -101,6 +101,7 @@ public class RunnableServer implements Runnable {
 		Socket s;
 		ObjectInputStream ois;
 		ObjectOutputStream oos;
+		boolean stop = false;
 		
 		public workerServiceThread(Socket socket) {
 			s = socket;
@@ -112,7 +113,7 @@ public class RunnableServer implements Runnable {
 		}
 		
 		public void run(){
-			while(true){
+			while(!stop){
 				WorkerCommand workerCommand;
 				try {
 					workerCommand = (WorkerCommand) ois.readObject();
@@ -120,6 +121,7 @@ public class RunnableServer implements Runnable {
 					handleReply(workerCommand, s);
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
+					stop = true;
 				}
 			}
 		}
