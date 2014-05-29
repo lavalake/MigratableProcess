@@ -146,6 +146,7 @@ public class ProcessWorker {
 						worker.socket.getOutputStream());
 				worker.ois = new ObjectInputStream(
 						worker.socket.getInputStream());
+				//worker.oos.writeObject(new String("abc"));
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create stream");
@@ -156,9 +157,8 @@ public class ProcessWorker {
 			
 			while (!worker.stop) {
 				try {
-					
-					MasterCommand masterCommand = (MasterCommand) worker.ois
-							.readObject();
+					//System.out.println((String) worker.ois.readObject());
+					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
 					case "start":
 						worker.handleStartCommand(masterCommand);
