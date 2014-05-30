@@ -37,7 +37,8 @@ public class WorkerService extends Thread {
 				ProcessManager.getInstance().getWorkerToProcesses().remove(sourceWorkerID);
 				ProcessInfoWrapper wrapper = new ProcessInfoWrapper(process.getProcessID(), StatusType.RUNNING);
 				ProcessManager.getInstance().getWorkerToProcesses().get(workerID).add(wrapper);
-				oos.writeObject(sc);
+				ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getWorkerService().writeToWorker(sc);
+				//oos.writeObject(sc);
 			} catch (IOException e) {
 				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());
 				ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getWorkerService().stopWorker(workerID);

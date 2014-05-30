@@ -29,7 +29,7 @@ public class TransactionalFileInputStream extends InputStream implements
 
 	@Override
 	public int read() throws IOException {
-		if (migrated) {
+		if (randomAccessFile == null || migrated) {
 			randomAccessFile = new RandomAccessFile(sourceFile, "r");
 			randomAccessFile.seek(offset);
 			migrated = false;

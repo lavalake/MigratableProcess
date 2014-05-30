@@ -28,7 +28,7 @@ public class TransactionalFileOutputStream extends OutputStream implements
 	
 	@Override
 	public void write(int aByte) throws IOException {
-		if(migrated){
+		if(randomAccessFile == null || migrated){
 			randomAccessFile = new RandomAccessFile(targetFile, "rw");
 			randomAccessFile.seek(offset);
 			migrated = false;
