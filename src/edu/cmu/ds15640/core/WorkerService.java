@@ -70,8 +70,15 @@ public class WorkerService extends Thread {
 	}
 	
 	public void run(){
+		WorkerCommand workerCommand;
+		MasterCommand masterCommand = new MasterCommand(CommandType.ASSIGNID, workerID);
+		try {
+			writeToWorker(masterCommand);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			stopWorker(workerID);
+		}
 		while(!stop){
-			WorkerCommand workerCommand;
 			try {
 				workerCommand = (WorkerCommand) ois.readObject();
 				handleReply(workerCommand);

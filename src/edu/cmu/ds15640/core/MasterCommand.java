@@ -10,6 +10,7 @@ public class MasterCommand implements Serializable {
 	private static final long serialVersionUID = -2245667253840915290L;
 	private CommandType type;
 	//ProcessID is for the getinfo
+	private int workerID;
 	private int processID;
 	//migratableProcess is for migrateTo
 	private MigratableProcess migratableProcess;
@@ -22,6 +23,10 @@ public class MasterCommand implements Serializable {
 	public MasterCommand(CommandType ct){
 		type = ct;
 		migratableProcess = null;
+	}
+	public MasterCommand(CommandType ct, int workerID){
+		type = ct;
+		this.workerID = workerID;
 	}
 	
 	public MasterCommand(CommandType ct, MigratableProcess mp){
