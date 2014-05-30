@@ -62,6 +62,10 @@ public class MasterCommand implements Serializable {
 	public String[] getArgs() {
 		return args;
 	}
+
+	public int getTargetWorkerID() {
+		return targetWorkerID;
+	}
 	
 	
 }

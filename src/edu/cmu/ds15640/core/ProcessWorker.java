@@ -25,6 +25,7 @@ public class ProcessWorker {
 	private HashMap<Integer, MigratableProcess> map;
 
 	private Class processClass;
+	private Thread t;
 
 	private volatile boolean stop = false;
 
@@ -43,20 +44,14 @@ public class ProcessWorker {
 			System.err.println("fail to send manager");
 		}
 	}
-
-	private MasterCommand receiveFromManager() {
-		MasterCommand masterCommand = null;
-		try {
-			masterCommand = (MasterCommand) ois.readObject();
-		} catch (IOException e) {
-			System.err.println("Cannot read from master");
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			System.err.println("class not found");
-		}
-		return masterCommand;
+	
+	private void runProcess (MigratableProcess mp) {
+		System.out.println("start process");
+		t = new Thread(mp);
+		t.start();
+		System.out.println("end process");
 	}
-
+	
 	private void handleStartCommand(MasterCommand masterCommand) {
 		WorkerCommand startCommand;
 		try {
@@ -66,12 +61,7 @@ public class ProcessWorker {
 			Object[] passed = {masterCommand.getArgs()};
 			MigratableProcess process = (MigratableProcess) constructor.newInstance(passed);
 			
-			System.out.println("start process");
-			
-			Thread t = new Thread(process);
-			t.start();
-			
-			System.out.println("end process");
+			runProcess(process);
 			
 			process.setProcessID(masterCommand.getProcessID());
 
@@ -127,14 +117,22 @@ public class ProcessWorker {
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
 		MigratableProcess mp = map.get(masterCommand.getProcessID());
+		mp.suspend();
+		//TODO update list
 		WorkerCommand migrateCommand = new WorkerCommand(CommandType.MIGRATETO,
-				mp);
+				mp, masterCommand.getTargetWorkerID());
 		sendToManager(migrateCommand);
+		System.out.println("finnish migrate");
+	}
+	
+	private void handleMigrateStartCommand (MasterCommand masterCommand) {
+		MigratableProcess mp = masterCommand.getMigratableProcess();
+		runProcess(mp);
+		//TODO update list
+		System.out.println("accept migration and start to run");
 	}
 
 	public static void main(String[] args) {
-		
-		
 	/*
 		ProcessWorker worker = new ProcessWorker("localhost", 8888);
 		String[] arr = {"CHAPTER", "/Users/haoge/git/MigratableProcess/lifeofjesus.txt", "/Users/haoge/git/MigratableProcess/empty.txt"};
@@ -142,7 +140,6 @@ public class ProcessWorker {
 		worker.handleStartCommand(mc);
 		
   */
-		
 		if (args.length == 2) {
 			String host = args[0];
 			int port = Integer.parseInt(args[1]);
@@ -176,6 +173,9 @@ public class ProcessWorker {
 					switch (masterCommand.getType().name().toLowerCase()) {
 					case "start":
 						worker.handleStartCommand(masterCommand);
+						break;
+					case "migratestart":
+						worker.handleMigrateStartCommand(masterCommand);
 						break;
 					case "getinfo":
 						worker.handleInfoCommand();
