@@ -27,6 +27,7 @@ public class WorkerService extends Thread {
 	private void handleReply(WorkerCommand workerCommand) {
 		switch (workerCommand.getType().name().toLowerCase()) {
 		case "migrateto":
+			System.out.println("accept migrateto command");
 			MigratableProcess process = workerCommand.getMigratableProcess();
 			int sourceWorkerID = workerCommand.getSourceWorkerID();
 			int workerID = workerCommand.getTargetWorkerID();

@@ -7,8 +7,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 public class ProcessWorker {
@@ -148,7 +146,7 @@ public class ProcessWorker {
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create socket");
-				e.printStackTrace();
+				System.exit(0);
 			}
 
 			System.out.println("Create socket");
@@ -176,12 +174,14 @@ public class ProcessWorker {
 						worker.handleStartCommand(masterCommand);
 						break;
 					case "migratestart":
+						System.out.println("accept migrate start command");
 						worker.handleMigrateStartCommand(masterCommand);
 						break;
 					case "getinfo":
 						worker.handleInfoCommand();
 						break;
 					case "migrate":
+						System.out.println("accept migrate command");
 						worker.handleMigrateCommand(masterCommand);
 						break;
 					default:
