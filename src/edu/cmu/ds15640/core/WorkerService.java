@@ -28,9 +28,14 @@ public class WorkerService extends Thread {
 		switch (workerCommand.getType().name().toLowerCase()) {
 		case "migrateto":
 			MigratableProcess process = workerCommand.getMigratableProcess();
+			int sourceWorkerID = workerCommand.getSourceWorkerID();
 			int workerID = workerCommand.getTargetWorkerID();
 			try {
 				MasterCommand sc = new MasterCommand(CommandType.MIGRATESTART, process);
+				//Update map
+				ProcessManager.getInstance().getWorkerToProcesses().remove(sourceWorkerID);
+				ProcessInfoWrapper wrapper = new ProcessInfoWrapper(process.getProcessID(), StatusType.RUNNING);
+				ProcessManager.getInstance().getWorkerToProcesses().get(workerID).add(wrapper);
 				oos.writeObject(sc);
 			} catch (IOException e) {
 				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());

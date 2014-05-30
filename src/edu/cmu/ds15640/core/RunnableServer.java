@@ -28,7 +28,7 @@ public class RunnableServer implements Runnable {
 				WorkerInfo newWorker = new WorkerInfo(workerID, IPAddress, port, workerService);
 				workerID++;
 				ProcessManager.getInstance().getWorkerToWorkerInfo().put(newWorker.getWorkerID(), newWorker);
-				ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<MigratableProcess>());
+				ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<ProcessInfoWrapper>());
 				workerService.start();
 			}
 		} catch (IOException e) {

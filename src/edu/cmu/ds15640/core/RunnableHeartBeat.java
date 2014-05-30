@@ -23,7 +23,7 @@ public class RunnableHeartBeat implements Runnable {
 				}
 			}
 			try {
-				Thread.sleep(10* Timer.ONE_SECOND);
+				Thread.sleep(10 * Timer.ONE_SECOND);
 			} catch (InterruptedException e) {
 				System.out.println(e.toString());
 			}

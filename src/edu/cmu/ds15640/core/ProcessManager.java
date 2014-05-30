@@ -14,13 +14,13 @@ public class ProcessManager {
 	private static ProcessManager processManager;
 	private final static Lock mutex = new ReentrantLock();
 	private ConcurrentHashMap<Integer, WorkerInfo> workerToWorkerInfo;
-	private ConcurrentHashMap<Integer, ArrayList<MigratableProcess>> workerToProcesses;
+	private ConcurrentHashMap<Integer, ArrayList<ProcessInfoWrapper>> workerToProcesses;
 	private int processIDCounter = 10000;
 	private RunnableServer runnableServer;
 	private RunnableHeartBeat runnableHeartBeat;
 
 	private ProcessManager() {
-		workerToProcesses = new ConcurrentHashMap<Integer, ArrayList<MigratableProcess>>();
+		workerToProcesses = new ConcurrentHashMap<Integer, ArrayList<ProcessInfoWrapper>>();
 		workerToWorkerInfo = new ConcurrentHashMap<Integer, WorkerInfo>();
 	}
 
@@ -128,12 +128,12 @@ public class ProcessManager {
 		workerToWorkerInfo.get(workerID).getWorkerService().stopWorker(workerID);
 	}
 
-	private MigratableProcess getProcessWithID(int processID) {
+	private ProcessInfoWrapper getProcessWithID(int processID) {
 		for(int i : workerToProcesses.keySet()){
-			ArrayList<MigratableProcess> list = workerToProcesses.get(i);
-			for(MigratableProcess mp: list){
-				if(mp.getProcessID() == processID){
-					return mp;
+			ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(i);
+			for(ProcessInfoWrapper wrap: list){
+				if(wrap.getProcessID() == processID){
+					return wrap;
 				}
 			}
 		}
@@ -162,8 +162,16 @@ public class ProcessManager {
 			args[i - 3] = strs[i];
 		}
 		try {
-			//Validate the processName here
+			try {
+				Class processClass = ProcessWorker.class.getClassLoader().loadClass(processName);
+			} catch (ClassNotFoundException e) {
+				System.out.println("The process is not exsit: " + processName);
+				System.out.println(e.toString());
+				return;
+			}
 			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
+			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, StatusType.RUNNING);
+			workerToProcesses.get(workerID).add(wrapper);
 			processIDCounter++;
 			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
 		} catch (IOException e) {
@@ -219,11 +227,11 @@ public class ProcessManager {
 	}
 	
 	public void updateProcessStatus(int processID, StatusType status) {
-		MigratableProcess mp = getProcessWithID(processID);
-		if(mp == null){
+		ProcessInfoWrapper wrap = getProcessWithID(processID);
+		if(wrap == null){
 			System.out.println("fail to update status with processID: " + processID);
 		}
-		mp.setStatus(status);
+		wrap.setStatus(status);
 	}
 	
 	public void closeManager(){
@@ -236,7 +244,7 @@ public class ProcessManager {
 		return workerToWorkerInfo;
 	}
 
-	public ConcurrentHashMap<Integer, ArrayList<MigratableProcess>> getWorkerToProcesses() {
+	public ConcurrentHashMap<Integer, ArrayList<ProcessInfoWrapper>> getWorkerToProcesses() {
 		return workerToProcesses;
 	}
 }

@@ -11,6 +11,7 @@ public class WorkerCommand implements Serializable {
 	private CommandType type;
 	private MigratableProcess migratableProcess;
 	//The targetWorkerID is for the target worker the process migrate to
+	private int sourceWorkerID;
 	private int targetWorkerID;
 	private StatusType status;
 	private int processId;
@@ -72,4 +73,14 @@ public class WorkerCommand implements Serializable {
 	public int getProcessId() {
 		return processId;
 	}
+
+	public int getSourceWorkerID() {
+		return sourceWorkerID;
+	}
+
+	public void setSourceWorkerID(int sourceWorkerID) {
+		this.sourceWorkerID = sourceWorkerID;
+	}
+	
+	
 }
