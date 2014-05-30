@@ -33,6 +33,7 @@ public class ProcessWorker {
 		this.port = port;
 		this.statusList = new ArrayList<StatusType>();
 		this.pidList = new ArrayList<Integer>();
+		this.map = new HashMap<Integer, MigratableProcess>();
 	}
 
 	private void sendToManager(WorkerCommand sc) {
@@ -65,9 +66,16 @@ public class ProcessWorker {
 			Object[] passed = {masterCommand.getArgs()};
 			MigratableProcess process = (MigratableProcess) constructor.newInstance(passed);
 			
+			System.out.println("start process");
+			
+			Thread t = new Thread(process);
+			t.start();
+			
+			System.out.println("end process");
+			
 			process.setProcessID(masterCommand.getProcessID());
 
-			processList.add(process);
+			//processList.add(process);
 			pidList.add(process.getProcessID());
 			map.put(masterCommand.getProcessID(), process);
 
@@ -126,17 +134,15 @@ public class ProcessWorker {
 
 	public static void main(String[] args) {
 		
-		/*********/
 		
+	/*
 		ProcessWorker worker = new ProcessWorker("localhost", 8888);
-		String[] arr = {"CHAPTER", "lifeofjesus.txt", "empty.txt"};
+		String[] arr = {"CHAPTER", "/Users/haoge/git/MigratableProcess/lifeofjesus.txt", "/Users/haoge/git/MigratableProcess/empty.txt"};
 		MasterCommand mc = new MasterCommand(CommandType.START, "edu.cmu.ds15640.core.GrepProcess", 1001, arr);
 		worker.handleStartCommand(mc);
 		
-		/*********/
+  */
 		
-		
-	/*
 		if (args.length == 2) {
 			String host = args[0];
 			int port = Integer.parseInt(args[1]);
@@ -157,7 +163,6 @@ public class ProcessWorker {
 						worker.socket.getOutputStream());
 				worker.ois = new ObjectInputStream(
 						worker.socket.getInputStream());
-				//worker.oos.writeObject(new String("abc"));
 			} catch (IOException e) {
 				worker.stop = true;
 				System.err.println("cannot create stream");
@@ -167,7 +172,6 @@ public class ProcessWorker {
 			
 			while (!worker.stop) {
 				try {
-					//System.out.println((String) worker.ois.readObject());
 					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
 					case "start":
@@ -191,8 +195,6 @@ public class ProcessWorker {
 					System.err.println("class not found");
 				}
 			}
-				
-				
 			try {
 				worker.oos.close();
 				worker.ois.close();
@@ -204,6 +206,6 @@ public class ProcessWorker {
 		} else {
 			System.out.println("Please enter the host ip and port number");
 		}
-    */
+    
 	}
 }
