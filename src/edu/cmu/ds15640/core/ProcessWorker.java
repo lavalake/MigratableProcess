@@ -20,9 +20,8 @@ public class ProcessWorker {
 
 	private ArrayList<StatusType> statusList;
 	private ArrayList<Integer> pidList;
-	private ArrayList<MigratableProcess> processList;
 
-	private HashMap<Integer, MigratableProcess> map;
+	private HashMap<Integer, MigratableProcess> currentMap;
 
 	private Class processClass;
 	private Thread t;
@@ -32,9 +31,7 @@ public class ProcessWorker {
 	public ProcessWorker(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.statusList = new ArrayList<StatusType>();
-		this.pidList = new ArrayList<Integer>();
-		this.map = new HashMap<Integer, MigratableProcess>();
+		this.currentMap = new HashMap<Integer, MigratableProcess>();
 	}
 
 	private void sendToManager(WorkerCommand sc) {
@@ -67,7 +64,7 @@ public class ProcessWorker {
 
 			//processList.add(process);
 			pidList.add(process.getProcessID());
-			map.put(masterCommand.getProcessID(), process);
+			currentMap.put(masterCommand.getProcessID(), process);
 
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.RUNNING, masterCommand.getProcessID());
@@ -116,7 +113,7 @@ public class ProcessWorker {
 	}
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
-		MigratableProcess mp = map.get(masterCommand.getProcessID());
+		MigratableProcess mp = currentMap.get(masterCommand.getProcessID());
 		mp.suspend();
 		//TODO update list
 		WorkerCommand migrateCommand = new WorkerCommand(CommandType.MIGRATETO,
