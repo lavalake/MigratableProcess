@@ -7,6 +7,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class ProcessWorker {
@@ -14,12 +16,10 @@ public class ProcessWorker {
 	private String host;
 	private int port;
 	private Socket socket;
+	private int workID;
 
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
-
-	private ArrayList<StatusType> statusList;
-	private ArrayList<Integer> pidList;
 
 	private HashMap<Integer, MigratableProcess> currentMap;
 
@@ -46,6 +46,7 @@ public class ProcessWorker {
 		System.out.println("start process");
 		t = new Thread(mp);
 		t.start();
+		currentMap.put(mp.getProcessID(), mp);
 		System.out.println("end process");
 	}
 	
@@ -57,14 +58,8 @@ public class ProcessWorker {
 			Constructor constructor = processClass.getConstructor(String[].class);
 			Object[] passed = {masterCommand.getArgs()};
 			MigratableProcess process = (MigratableProcess) constructor.newInstance(passed);
-			
-			runProcess(process);
-			
 			process.setProcessID(masterCommand.getProcessID());
-
-			//processList.add(process);
-			pidList.add(process.getProcessID());
-			currentMap.put(masterCommand.getProcessID(), process);
+			runProcess(process);
 
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.RUNNING, masterCommand.getProcessID());
@@ -101,32 +96,38 @@ public class ProcessWorker {
 					StatusType.FAIL, masterCommand.getProcessID());
 			e.printStackTrace();
 		}
-
 		sendToManager(startCommand);
-
 	}
 
 	private void handleInfoCommand() {
-		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO,
-				statusList, pidList);
+		ArrayList<StatusType> statusList = new ArrayList<StatusType>();
+		ArrayList<Integer> pidList = new ArrayList<Integer>();
+		for (int i:currentMap.keySet()) {
+			pidList.add(i);
+			statusList.add(currentMap.get(i).getStatus());
+		}
+		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO, statusList, pidList);
 		sendToManager(infoCommand);
 	}
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
 		MigratableProcess mp = currentMap.get(masterCommand.getProcessID());
 		mp.suspend();
-		//TODO update list
+		currentMap.remove(mp.getProcessID());
 		WorkerCommand migrateCommand = new WorkerCommand(CommandType.MIGRATETO,
-				mp, masterCommand.getTargetWorkerID());
+				mp, masterCommand.getTargetWorkerID(), workID);
 		sendToManager(migrateCommand);
 		System.out.println("finnish migrate");
 	}
 	
 	private void handleMigrateStartCommand (MasterCommand masterCommand) {
 		MigratableProcess mp = masterCommand.getMigratableProcess();
-		runProcess(mp);
-		//TODO update list
 		System.out.println("accept migration and start to run");
+		runProcess(mp);
+	}
+	
+	private void handleAssignIDCommand (MasterCommand masterCommand) {
+		workID = masterCommand.getWorkerID();
 	}
 
 	public static void main(String[] args) {
@@ -168,6 +169,9 @@ public class ProcessWorker {
 				try {
 					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
+					case "assignid":
+						worker.handleAssignIDCommand(masterCommand);
+						break;
 					case "start":
 						worker.handleStartCommand(masterCommand);
 						break;

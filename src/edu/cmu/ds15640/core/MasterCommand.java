@@ -71,6 +71,9 @@ public class MasterCommand implements Serializable {
 	public int getTargetWorkerID() {
 		return targetWorkerID;
 	}
+	public int getWorkerID() {
+		return workerID;
+	}
 	
 	
 }

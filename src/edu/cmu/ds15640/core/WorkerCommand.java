@@ -36,9 +36,10 @@ public class WorkerCommand implements Serializable {
 		this.pidList = pID;
 	}
 	
-	public WorkerCommand(CommandType type, MigratableProcess mp, int targetWorkerID) {
+	public WorkerCommand(CommandType type, MigratableProcess mp, int targetWorkerID, int sourceWorkerID) {
 		this.type = type;
 		this.targetWorkerID = targetWorkerID;
+		this.sourceWorkerID = sourceWorkerID;
 		this.migratableProcess = mp;
 	}
 
