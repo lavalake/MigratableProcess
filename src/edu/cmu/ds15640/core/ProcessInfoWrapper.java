@@ -32,4 +32,9 @@ public class ProcessInfoWrapper implements Serializable {
 		this.processID = processID;
 	}
 
+	@Override
+	public String toString() {
+		return new String("ProcessID: " + processID + " Status:" + status);
+	}
+
 }
