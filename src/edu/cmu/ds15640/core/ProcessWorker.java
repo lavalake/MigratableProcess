@@ -65,34 +65,30 @@ public class ProcessWorker {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Process class not found");
-			e.printStackTrace();
 		} catch (SecurityException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
-			e.printStackTrace();
+			System.err.println("Security Exception");
 		} catch (NoSuchMethodException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Method not found");
-			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Illegal Argument");
-			e.printStackTrace();
 		} catch (InstantiationException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
-			e.printStackTrace();
+			System.err.println("Cannot create instance");
 		} catch (IllegalAccessException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Illegal Access");
-			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
-			e.printStackTrace();
+			System.err.println("Invalid Argument");
 		}
 		sendToManager(startCommand);
 	}
@@ -162,7 +158,6 @@ public class ProcessWorker {
 				e.printStackTrace();
 			}
 			
-			
 			while (!worker.stop) {
 				try {
 					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
@@ -174,14 +169,13 @@ public class ProcessWorker {
 						worker.handleStartCommand(masterCommand);
 						break;
 					case "migratestart":
-						System.out.println("accept migrate start command");
 						worker.handleMigrateStartCommand(masterCommand);
 						break;
 					case "getinfo":
 						worker.handleInfoCommand();
 						break;
 					case "migrate":
-						System.out.println("accept migrate command");
+						System.out.println("accept migrate command, target work ID" + masterCommand.getTargetWorkerID());
 						worker.handleMigrateCommand(masterCommand);
 						break;
 					default:
@@ -190,12 +184,13 @@ public class ProcessWorker {
 						break;
 					}
 				} catch (IOException e) {
+					worker.stop = true;
 					System.err.println("Cannot read from master");
-					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
 					System.err.println("class not found");
 				}
 			}
+			
 			try {
 				worker.oos.close();
 				worker.ois.close();
