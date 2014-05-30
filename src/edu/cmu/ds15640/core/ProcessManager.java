@@ -66,20 +66,20 @@ public class ProcessManager {
 		}
 		String[] strs = line.split(" ");
 		String command = strs[0];
-		switch (command.toLowerCase()) {
-		case "help":
+		switch (command) {
+		case "HELP":
 			handleHelpCommand();
 			break;
-		case "ls":
+		case "LS":
 			handleLsCommand();
 			break;
-		case "ps":
+		case "PS":
 			handlePsCommand();
 			break;
-		case "start":
+		case "START":
 			handleStartCommand(strs);
 			break;
-		case "migrate":
+		case "MIGRATE":
 			handleMigrateCommand(strs);
 			break;
 		default:
@@ -91,6 +91,7 @@ public class ProcessManager {
 	private void handleMigrateCommand(String[] strs) {
 		if(strs == null || strs.length != 4){
 			System.out.println("Wrong arguments, type 'help' for more information");
+			return;
 		}
 		int sourceWorkerID, targetWorkerID, processID;
 		try {
@@ -98,7 +99,7 @@ public class ProcessManager {
 			sourceWorkerID = Integer.parseInt(strs[2]);
 			targetWorkerID = Integer.parseInt(strs[3]);
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("workerID or processID is not an integer");
 			return;
 		}
 		if(!workerToWorkerInfo.containsKey(sourceWorkerID)){
@@ -110,7 +111,11 @@ public class ProcessManager {
 			return;
 		}
 		if(getProcessWithID(processID) == null){
-			System.out.println("The processID: " + processID + " is not exist");
+			System.out.println("The process: " + processID + " is not exist");
+			return;
+		}
+		if(getProcessOnMachineWithID(processID, sourceWorkerID) == null){
+			System.out.println("The process: " + processID + " is not exist on machine: " + sourceWorkerID);
 			return;
 		}
 		try {
@@ -122,6 +127,19 @@ public class ProcessManager {
 			RemoveWorker(sourceWorkerID);
 			return;
 		}
+	}
+
+	private ProcessInfoWrapper getProcessOnMachineWithID(int processID, int sourceWorkerID) {
+		ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(sourceWorkerID);
+		if(list == null){
+			return null;
+		}
+		for(ProcessInfoWrapper wrap: list){
+			if(wrap.getProcessID() == processID){
+				return wrap;
+			}
+		}
+		return null;
 	}
 
 	private void RemoveWorker(int workerID) {
@@ -148,10 +166,9 @@ public class ProcessManager {
 		try {
 			workerID = Integer.parseInt(strs[1]);
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("The workerID is not an integer");
 			return;
 		}
-		
 		if(!workerToWorkerInfo.containsKey(workerID)){
 			System.out.println("The worker: " + workerID + " is not exist");
 			return;
@@ -162,13 +179,13 @@ public class ProcessManager {
 			args[i - 3] = strs[i];
 		}
 		try {
-			try {
-				Class processClass = ProcessWorker.class.getClassLoader().loadClass(processName);
-			} catch (ClassNotFoundException e) {
-				System.out.println("The process is not exsit: " + processName);
-				System.out.println(e.toString());
-				return;
-			}
+			Class processClass = ProcessWorker.class.getClassLoader().loadClass(processName);
+		} catch (ClassNotFoundException e) {
+			System.out.println("The process is not exsit: " + processName);
+			System.out.println(e.toString());
+			return;
+		}
+		try {
 			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
 			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, StatusType.RUNNING);
 			workerToProcesses.get(workerID).add(wrapper);
@@ -230,11 +247,15 @@ public class ProcessManager {
 		ProcessInfoWrapper wrap = getProcessWithID(processID);
 		if(wrap == null){
 			System.out.println("fail to update status with processID: " + processID);
+			return;
 		}
 		wrap.setStatus(status);
 	}
 	
 	public void closeManager(){
+		for(int id: workerToWorkerInfo.keySet()){
+			RemoveWorker(id);
+		}
 		runnableServer.stopServer();
 		runnableHeartBeat.stopHeartBeat();
 		System.exit(0);

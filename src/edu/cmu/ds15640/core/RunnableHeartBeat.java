@@ -10,7 +10,6 @@ public class RunnableHeartBeat implements Runnable {
 	@Override
 	public void run() {
 		while(!stop){
-			//System.out.println("Send heart beat information");
 			for(int id: ProcessManager.getInstance().getWorkerToWorkerInfo().keySet()){
 				try {
 					MasterCommand sc = new MasterCommand(CommandType.GETINFO);

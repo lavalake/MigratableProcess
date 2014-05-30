@@ -5,12 +5,14 @@ public class WorkerInfo {
 	private String IPAddress;
 	private int port;
 	private WorkerService workerService;
+	private StatusType status;
 
 	public WorkerInfo(int id, String ip, int p, WorkerService ws) {
 		workerID = id;
 		IPAddress = ip;
 		port = p;
 		workerService = ws;
+		status = StatusType.RUNNING;
 	}
 
 	public int getWorkerID() {
@@ -27,6 +29,14 @@ public class WorkerInfo {
 
 	public String toString() {
 		return new String("workerID: " + workerID + "	IPAddress: " + IPAddress
-				+ "	Port: " + port);
+				+ "	Port: " + port + " Status: " + status.toString());
+	}
+
+	public StatusType getStatus() {
+		return status;
+	}
+
+	public void setStatus(StatusType status) {
+		this.status = status;
 	}
 }

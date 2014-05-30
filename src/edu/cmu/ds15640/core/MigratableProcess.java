@@ -8,37 +8,37 @@ public abstract class MigratableProcess implements Serializable, Runnable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8679277965235631138L;
-	
+
 	private int processID;
 	private StatusType status;
-	
-	public MigratableProcess(){
+
+	public MigratableProcess() {
 		status = StatusType.RUNNING;
 	}
-	
+
 	@Override
 	public abstract void run();
-	
+
 	public abstract void suspend();
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return new String("ProcessID: " + processID + "		Status: " + status);
 	}
-	
-	public void setProcessID(int id){
+
+	public void setProcessID(int id) {
 		processID = id;
 	}
-	
-	public int getProcessID(){
+
+	public int getProcessID() {
 		return processID;
 	}
-	
-	public StatusType getStatus(){
+
+	public StatusType getStatus() {
 		return status;
 	}
-	
-	public void setStatus(StatusType stype){
+
+	public void setStatus(StatusType stype) {
 		status = stype;
 	}
 

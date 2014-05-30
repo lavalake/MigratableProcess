@@ -27,21 +27,24 @@ public class WorkerService extends Thread {
 	private void handleReply(WorkerCommand workerCommand) {
 		switch (workerCommand.getType().name().toLowerCase()) {
 		case "migrateto":
-			System.out.println("accept migrateto command");
 			MigratableProcess process = workerCommand.getMigratableProcess();
 			int sourceWorkerID = workerCommand.getSourceWorkerID();
-			int workerID = workerCommand.getTargetWorkerID();
+			int targetWorkerID = workerCommand.getTargetWorkerID();
 			try {
+				int processID = process.getProcessID();
 				MasterCommand sc = new MasterCommand(CommandType.MIGRATESTART, process);
 				//Update map
-				ProcessManager.getInstance().getWorkerToProcesses().remove(sourceWorkerID);
+				for(int i = 0; i < ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).size(); i++){
+					if(ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).get(i).getProcessID() == processID){
+						ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).remove(i);
+					}
+				}
 				ProcessInfoWrapper wrapper = new ProcessInfoWrapper(process.getProcessID(), StatusType.RUNNING);
-				ProcessManager.getInstance().getWorkerToProcesses().get(workerID).add(wrapper);
-				ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getWorkerService().writeToWorker(sc);
-				//oos.writeObject(sc);
+				ProcessManager.getInstance().getWorkerToProcesses().get(targetWorkerID).add(wrapper);
+				ProcessManager.getInstance().getWorkerToWorkerInfo().get(targetWorkerID).getWorkerService().writeToWorker(sc);
 			} catch (IOException e) {
-				System.out.println("Worker "+ workerID + "is failed: Cannot migrate process +" + process.getProcessID());
-				ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).getWorkerService().stopWorker(workerID);
+				System.out.println("Worker "+ targetWorkerID + "is failed: Cannot migrate process +" + process.getProcessID());
+				ProcessManager.getInstance().getWorkerToWorkerInfo().get(targetWorkerID).getWorkerService().stopWorker(targetWorkerID);
 			}
 			break;
 		case "returninfo":
@@ -87,6 +90,7 @@ public class WorkerService extends Thread {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
+				System.out.println("The workerID: " + workerID + " is failed");
 				e.printStackTrace();
 				stopWorker(workerID);
 			}
@@ -99,7 +103,9 @@ public class WorkerService extends Thread {
 	
 	public void stopWorker(int workerID){
 		stop = true;
-		ProcessManager.getInstance().getWorkerToProcesses().remove(workerID);
-		ProcessManager.getInstance().getWorkerToWorkerInfo().remove(workerID);
+		for(int i = 0; i < ProcessManager.getInstance().getWorkerToProcesses().get(workerID).size(); i++){
+			ProcessManager.getInstance().updateProcessStatus(ProcessManager.getInstance().getWorkerToProcesses().get(workerID).get(i).getProcessID(), StatusType.FAIL);
+		}
+		ProcessManager.getInstance().getWorkerToWorkerInfo().get(workerID).setStatus(StatusType.MACHINEFAIL);;
 	}
 }

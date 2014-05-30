@@ -7,7 +7,7 @@ public class ProcessInfoWrapper implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4221885566660617590L;
-	
+
 	int processID;
 	StatusType status;
 

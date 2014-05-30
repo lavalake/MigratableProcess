@@ -3,45 +3,47 @@ package edu.cmu.ds15640.core;
 import java.io.Serializable;
 
 public class MasterCommand implements Serializable {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2245667253840915290L;
 	private CommandType type;
-	//ProcessID is for the getinfo
-	private int workerID;
+	// ProcessID is for the getinfo
 	private int processID;
-	//migratableProcess is for migrateTo
+
+	// migratableProcess, processName and args are for migrateTo
 	private MigratableProcess migratableProcess;
-	//processName and args are for start
 	private String processName;
 	private String[] args;
-	//targetWorker is for migrate
+
+	// sourceWorkerID and targetWorker are for migrate
+	private int sourceWorkerID;
 	private int targetWorkerID;
-	
-	public MasterCommand(CommandType ct){
+
+	public MasterCommand(CommandType ct) {
 		type = ct;
 		migratableProcess = null;
 	}
-	public MasterCommand(CommandType ct, int workerID){
+
+	public MasterCommand(CommandType ct, int workerID) {
 		type = ct;
-		this.workerID = workerID;
+		this.sourceWorkerID = workerID;
 	}
-	
-	public MasterCommand(CommandType ct, MigratableProcess mp){
+
+	public MasterCommand(CommandType ct, MigratableProcess mp) {
 		type = ct;
 		migratableProcess = mp;
 	}
 
-	public MasterCommand(CommandType ct, String processName,
-			int processID, String[] args) {
+	public MasterCommand(CommandType ct, String processName, int processID,
+			String[] args) {
 		type = ct;
 		this.processName = processName;
 		this.processID = processID;
 		this.args = args;
 	}
-	
+
 	public MasterCommand(CommandType ct, int targetWorkerID, int processID) {
 		type = ct;
 		this.targetWorkerID = targetWorkerID;
@@ -71,9 +73,9 @@ public class MasterCommand implements Serializable {
 	public int getTargetWorkerID() {
 		return targetWorkerID;
 	}
+
 	public int getWorkerID() {
-		return workerID;
+		return sourceWorkerID;
 	}
-	
-	
+
 }
