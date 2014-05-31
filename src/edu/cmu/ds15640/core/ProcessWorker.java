@@ -26,6 +26,7 @@ public class ProcessWorker {
 
 	private HashMap<Integer, MigratableProcess> currentMap;
 
+	@SuppressWarnings("rawtypes")
 	private Class processClass;
 	private Thread t;
 
@@ -66,6 +67,7 @@ public class ProcessWorker {
 		try {
 			processClass = ProcessWorker.class.getClassLoader().loadClass(
 					masterCommand.getProcessName());
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			Constructor constructor = processClass
 					.getConstructor(String[].class);
 			Object[] passed = { masterCommand.getArgs() };

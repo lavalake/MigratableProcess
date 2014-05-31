@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class RunnableServer implements Runnable {
 
-	public static int port;
+	private int port;
 	private volatile boolean stop;
 	private int workerID = 0;
 	
