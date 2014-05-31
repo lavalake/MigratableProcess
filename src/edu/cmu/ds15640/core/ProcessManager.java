@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
 
@@ -77,6 +78,9 @@ public class ProcessManager {
 		case "ps":
 			handlePsCommand();
 			break;
+		case "kill":
+			handleKillCommand(strs);
+			break;
 		case "start":
 			handleStartCommand(strs);
 			break;
@@ -87,6 +91,38 @@ public class ProcessManager {
 			System.out.println("Wrong command, type 'help' for more information");
 			break;
 		}
+	}
+
+	private void handleKillCommand(String[] strs) {
+		if(strs == null || strs.length != 2){
+			System.out.println("Wrong arguments, type 'help' for more information");
+			return;
+		}
+		int processID;
+		try {
+			processID = Integer.parseInt(strs[1]);
+		} catch (Exception e) {
+			System.out.println("workerID or processID is not an integer");
+			return;
+		}
+		if(getProcessWithID(processID) == null){
+			System.out.println("The process: " + processID + " is not exist");
+			return;
+		}
+		/*
+		try {
+			MasterCommand sc = new MasterCommand(CommandType.KILL, processName, processIDCounter, args);
+			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, processName, StatusType.RUNNING);
+			workerToProcesses.get(workerID).add(wrapper);
+			processIDCounter++;
+			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
+		} catch (IOException e) {
+			System.out.println("Worker: " + workerID + " is failed");
+			System.out.println(e.toString());
+			RemoveWorker(workerID);
+			return;
+		}
+		*/
 	}
 
 	private void handleMigrateCommand(String[] strs) {
@@ -200,7 +236,7 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
-		sb.append("kill:    remove the failed process\n");
+		sb.append("kill:    PROCESSID \n        remove the process\n");
 		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
 		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
 		System.out.println(sb);

@@ -59,9 +59,9 @@ public class WorkerService extends Thread {
 			ArrayList<Integer> processes = workerCommand.getProcessID();
 			ArrayList<StatusType> statuses = workerCommand.getStatusList();
 			for(int i = 0; i < processes.size(); i++){
-				if(statuses.get(i) == StatusType.FINISHED){
+				if(statuses.get(i) == StatusType.COMPLETED){
 					int processID = processes.get(i);
-					ProcessManager.getInstance().updateProcessStatus(processID, StatusType.FINISHED);
+					ProcessManager.getInstance().updateProcessStatus(processID, StatusType.COMPLETED);
 				}else if(statuses.get(i) == StatusType.FAIL){
 					int processID = processes.get(i);
 					ProcessManager.getInstance().updateProcessStatus(processID, StatusType.FAIL);
