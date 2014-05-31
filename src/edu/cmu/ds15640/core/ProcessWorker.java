@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
 import edu.cmu.ds15640.command.WorkerCommand;
@@ -35,7 +34,7 @@ public class ProcessWorker {
 	public ProcessWorker(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.currentMap = new HashMap<Integer, MigratableProcess>();	
+		this.currentMap = new HashMap<Integer, MigratableProcess>();
 	}
 
 	public String getHost() {
@@ -145,6 +144,12 @@ public class ProcessWorker {
 		workID = masterCommand.getWorkerID();
 	}
 
+	private void handleKillCommand(MasterCommand masterCommand) {
+		MigratableProcess mp = currentMap.remove(masterCommand.getProcessID());
+		mp.suspend();
+		System.out.println("Successfully kill the process");
+	}
+
 	public static void main(String[] args) {
 		if (args.length == 2) {
 			String host = args[0];
@@ -194,6 +199,9 @@ public class ProcessWorker {
 								.println("accept migrate command, target work ID"
 										+ masterCommand.getTargetWorkerID());
 						worker.handleMigrateCommand(masterCommand);
+						break;
+					case "kill":
+						worker.handleKillCommand(masterCommand);
 						break;
 					default:
 						System.out.println("Wrong command: "
