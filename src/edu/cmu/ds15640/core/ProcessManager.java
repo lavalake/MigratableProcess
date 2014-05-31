@@ -10,8 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.reflections.Reflections;
-
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
 import edu.cmu.ds15640.process.MigratableProcess;
@@ -25,13 +23,10 @@ public class ProcessManager {
 	private int processIDCounter = 10000;
 	private RunnableServer runnableServer;
 	private RunnableHeartBeat runnableHeartBeat;
-	private Set<Class<? extends MigratableProcess>> availableProcesses;
 
 	private ProcessManager() {
 		workerToProcesses = new ConcurrentHashMap<Integer, ArrayList<ProcessInfoWrapper>>();
 		workerToWorkerInfo = new ConcurrentHashMap<Integer, WorkerInfo>();
-		Reflections reflections = new Reflections("edu.cmu.ds15640.process");
-		availableProcesses = reflections.getSubTypesOf(MigratableProcess.class);
 	}
 
 	public static ProcessManager getInstance() {
@@ -159,8 +154,10 @@ public class ProcessManager {
 		for(int i = 3; i < strs.length; i++){
 			args[i - 3] = strs[i];
 		}
-		if(!isValidProcessName(processName)){
-			System.out.println("The process is not exsit: " + processName);
+		try {
+			Class processClass = ProcessManager.class.getClassLoader().loadClass(processName);
+		} catch (ClassNotFoundException e) {
+			System.out.println("Process: " + processName + " is not exist");
 			return;
 		}
 		try {
@@ -207,8 +204,7 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
-		sb.append("lsp:     list all available process classes\n");
-		sb.append("rm:      remove the failed process\n");
+		sb.append("kill:    remove the failed process\n");
 		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
 		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
 		System.out.println(sb);
@@ -232,17 +228,6 @@ public class ProcessManager {
 		wrap.setStatus(status);
 	}
 	
-	private boolean isValidProcessName(String processName) {
-		Iterator<Class<? extends MigratableProcess>> it = availableProcesses.iterator();
-		while(it.hasNext()){
-			Class<? extends MigratableProcess> process = it.next();
-			if(process.getSimpleName().equals(processName)){
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private ProcessInfoWrapper getProcessOnMachineWithID(int processID, int sourceWorkerID) {
 		ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(sourceWorkerID);
 		if(list == null){
