@@ -128,7 +128,7 @@ public class ProcessManager {
 			return;
 		}
 		try {
-			MasterCommand sc = new MasterCommand(CommandType.KILL, processID);
+			MasterCommand sc = new MasterCommand(CommandType.KILL, workerID, processID);
 			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
@@ -194,6 +194,10 @@ public class ProcessManager {
 		}
 		if(!workerToWorkerInfo.containsKey(workerID)){
 			System.out.println("The worker: " + workerID + " is not exist");
+			return;
+		}
+		if(workerToWorkerInfo.get(workerID).getStatus() == StatusType.MACHINEFAIL){
+			System.out.println("The worker: " + workerID + " is removed");
 			return;
 		}
 		String processName = strs[2];
