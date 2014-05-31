@@ -71,20 +71,20 @@ public class ProcessManager {
 		}
 		String[] strs = line.split(" ");
 		String command = strs[0];
-		switch (command) {
-		case "HELP":
+		switch (command.toLowerCase()) {
+		case "help":
 			handleHelpCommand();
 			break;
-		case "LS":
+		case "ls":
 			handleLsCommand();
 			break;
-		case "PS":
+		case "ps":
 			handlePsCommand();
 			break;
-		case "START":
+		case "start":
 			handleStartCommand(strs);
 			break;
-		case "MIGRATE":
+		case "migrate":
 			handleMigrateCommand(strs);
 			break;
 		default:
