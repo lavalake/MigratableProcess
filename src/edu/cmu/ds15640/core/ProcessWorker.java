@@ -8,8 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
@@ -57,10 +56,8 @@ public class ProcessWorker {
 
 	private void runProcess(MigratableProcess mp) {
 		System.out.println("start process");
-		ExecutorService executor = Executors.newSingleThreadExecutor();
 		t = new Thread(mp);
-//		t.start();
-		executor.execute(t);
+		t.start();
 		currentMap.put(mp.getProcessID(), mp);
 		System.out.println("end process");
 	}
@@ -116,8 +113,12 @@ public class ProcessWorker {
 		ArrayList<StatusType> statusList = new ArrayList<StatusType>();
 		ArrayList<Integer> pidList = new ArrayList<Integer>();
 		for (int i : currentMap.keySet()) {
+			MigratableProcess mp = currentMap.get(i);
+			if (mp.isComplete()) {
+				mp.setStatus(StatusType.COMPLETED);
+			}
 			pidList.add(i);
-			statusList.add(currentMap.get(i).getStatus());
+			statusList.add(mp.getStatus());
 		}
 		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO,
 				statusList, pidList);
