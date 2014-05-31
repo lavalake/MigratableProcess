@@ -109,20 +109,35 @@ public class ProcessManager {
 			System.out.println("The process: " + processID + " is not exist");
 			return;
 		}
-		/*
+		int workerID = -1;
+		ProcessInfoWrapper wrapper = null;
+		for(int id: workerToProcesses.keySet()){
+			if((wrapper = getProcessOnMachineWithID(processID, id)) != null){
+				workerID = id;
+				break;
+			}
+		}
+		if(workerID == -1 || wrapper == null){
+			System.out.println("The process: " + processID + " is not exist");
+			return;
+		}
+		if(wrapper.getStatus() == StatusType.COMPLETED || wrapper.getStatus() == StatusType.FAIL 
+				|| workerToWorkerInfo.get(workerID).getStatus() == StatusType.MACHINEFAIL){
+			System.out.println("Process: " + processID + " is removed");
+			removeProcess(workerID, processID);
+			return;
+		}
 		try {
-			MasterCommand sc = new MasterCommand(CommandType.KILL, processName, processIDCounter, args);
-			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, processName, StatusType.RUNNING);
-			workerToProcesses.get(workerID).add(wrapper);
-			processIDCounter++;
+			MasterCommand sc = new MasterCommand(CommandType.KILL, processID);
 			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
 			System.out.println(e.toString());
-			RemoveWorker(workerID);
+			removeWorker(workerID);
 			return;
 		}
-		*/
+		System.out.println("Process: " + processID + " is removed");
+		removeProcess(workerID, processID);
 	}
 
 	private void handleMigrateCommand(String[] strs) {
@@ -161,7 +176,7 @@ public class ProcessManager {
 		} catch (IOException e) {
 			System.out.println("Worker: " + sourceWorkerID + " is failed");
 			System.out.println(e.toString());
-			RemoveWorker(sourceWorkerID);
+			removeWorker(sourceWorkerID);
 			return;
 		}
 	}
@@ -201,7 +216,7 @@ public class ProcessManager {
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
 			System.out.println(e.toString());
-			RemoveWorker(workerID);
+			removeWorker(workerID);
 			return;
 		}
 	}
@@ -273,8 +288,21 @@ public class ProcessManager {
 		return null;
 	}
 
-	private void RemoveWorker(int workerID) {
+	private void removeWorker(int workerID) {
 		workerToWorkerInfo.get(workerID).getWorkerService().stopWorker(workerID);
+	}
+
+	private void removeProcess(int workerID, int processID) {
+		int index = -1;
+		for(int i = 0; i < workerToProcesses.get(workerID).size(); i++){
+			if(workerToProcesses.get(workerID).get(i).getProcessID() == processID){
+				index = i;
+				break;
+			}
+		}
+		if(index != -1){
+			workerToProcesses.get(workerID).remove(index);
+		}
 	}
 
 	private ProcessInfoWrapper getProcessWithID(int processID) {
@@ -291,7 +319,7 @@ public class ProcessManager {
 	
 	public void closeManager(){
 		for(int id: workerToWorkerInfo.keySet()){
-			RemoveWorker(id);
+			removeWorker(id);
 		}
 		runnableServer.stopServer();
 		runnableHeartBeat.stopHeartBeat();
