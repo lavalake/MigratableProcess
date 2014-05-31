@@ -128,7 +128,7 @@ public class ProcessManager {
 			return;
 		}
 		try {
-			MasterCommand sc = new MasterCommand(CommandType.KILL, processID);
+			MasterCommand sc = new MasterCommand(CommandType.KILL, workerID, processID);
 			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
@@ -196,6 +196,10 @@ public class ProcessManager {
 			System.out.println("The worker: " + workerID + " is not exist");
 			return;
 		}
+		if(workerToWorkerInfo.get(workerID).getStatus() == StatusType.MACHINEFAIL){
+			System.out.println("The worker: " + workerID + " is removed");
+			return;
+		}
 		String processName = strs[2];
 		String[] args = new String[strs.length - 3];
 		for(int i = 3; i < strs.length; i++){
@@ -251,9 +255,9 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
-		sb.append("kill:    PROCESSID \n        remove the process\n");
-		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
-		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
+		sb.append("kill:    PROCESSID     --remove the process\n");
+		sb.append("start:   WORKERID PROCESSNAME ARG...     --start the process with args...\n");
+		sb.append("migrate: PROCESSID WORKERID1 WORKERID2     --migrate the process between workers");
 		System.out.println(sb);
 	}
 
