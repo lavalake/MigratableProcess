@@ -251,9 +251,9 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
-		sb.append("kill:    PROCESSID \n        remove the process\n");
-		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
-		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
+		sb.append("kill:    PROCESSID     --remove the process\n");
+		sb.append("start:   WORKERID PROCESSNAME ARG...     --start the process with args...\n");
+		sb.append("migrate: PROCESSID WORKERID1 WORKERID2     --migrate the process between workers");
 		System.out.println(sb);
 	}
 
