@@ -59,7 +59,6 @@ public class ProcessWorker {
 		t = new Thread(mp);
 		t.start();
 		currentMap.put(mp.getProcessID(), mp);
-		System.out.println("end process");
 	}
 
 	private void handleStartCommand(MasterCommand masterCommand) {
