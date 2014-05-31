@@ -106,6 +106,7 @@ public class ProcessWorker {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Invalid Argument");
+			e.printStackTrace();
 		}
 		sendToManager(startCommand);
 	}
@@ -147,6 +148,7 @@ public class ProcessWorker {
 	}
 
 	private void handleKillCommand(MasterCommand masterCommand) {
+		System.out.println(masterCommand.getProcessID());
 		MigratableProcess mp = currentMap.remove(masterCommand.getProcessID());
 		mp.suspend();
 		System.out.println("Successfully kill the process");

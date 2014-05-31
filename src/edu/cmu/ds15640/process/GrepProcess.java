@@ -59,6 +59,7 @@ public class GrepProcess extends MigratableProcess {
 				}
 			}
 		} catch (EOFException e) {
+			e.printStackTrace();
 			// End of File
 		} catch (IOException e) {
 			System.out.println("GrepProcess: Error: " + e);
