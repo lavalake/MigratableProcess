@@ -1,7 +1,10 @@
-package edu.cmu.ds15640.core;
+package edu.cmu.ds15640.command;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import edu.cmu.ds15640.core.StatusType;
+import edu.cmu.ds15640.process.MigratableProcess;
 
 public class WorkerCommand implements Serializable {
 	/**

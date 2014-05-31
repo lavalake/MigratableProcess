@@ -1,6 +1,8 @@
-package edu.cmu.ds15640.core;
+package edu.cmu.ds15640.command;
 
 import java.io.Serializable;
+
+import edu.cmu.ds15640.process.MigratableProcess;
 
 public class MasterCommand implements Serializable {
 

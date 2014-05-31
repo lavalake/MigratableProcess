@@ -1,4 +1,4 @@
-package edu.cmu.ds15640.core;
+package edu.cmu.ds15640.command;
 
 public enum CommandType {
 	START, STARTRETURN,

@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.cmu.ds15640.command.CommandType;
+import edu.cmu.ds15640.command.MasterCommand;
+
 public class ProcessManager {
 
 	private static int port;

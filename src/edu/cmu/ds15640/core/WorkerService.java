@@ -6,6 +6,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import edu.cmu.ds15640.command.CommandType;
+import edu.cmu.ds15640.command.MasterCommand;
+import edu.cmu.ds15640.command.WorkerCommand;
+import edu.cmu.ds15640.process.MigratableProcess;
+
 public class WorkerService extends Thread {
 	Socket s;
 	int workerID;

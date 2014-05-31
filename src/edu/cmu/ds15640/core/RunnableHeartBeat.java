@@ -1,7 +1,11 @@
 package edu.cmu.ds15640.core;
 
 import java.io.IOException;
+
 import javax.management.timer.Timer;
+
+import edu.cmu.ds15640.command.CommandType;
+import edu.cmu.ds15640.command.MasterCommand;
 
 public class RunnableHeartBeat implements Runnable {
 
