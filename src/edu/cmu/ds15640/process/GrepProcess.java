@@ -65,12 +65,18 @@ public class GrepProcess extends MigratableProcess {
 		}
 
 		suspending = false;
+		stop();
 	}
 
 	public void suspend() {
 		suspending = true;
 		while (suspending)
 			;
+	}
+
+	@Override
+	public void stop() {
+		complete = true;
 	}
 
 }

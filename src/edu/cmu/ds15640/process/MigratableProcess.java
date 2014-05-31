@@ -13,6 +13,7 @@ public abstract class MigratableProcess implements Serializable, Runnable {
 
 	private int processID;
 	private StatusType status;
+	protected boolean complete;
 
 	public MigratableProcess() {
 		status = StatusType.RUNNING;
@@ -23,6 +24,7 @@ public abstract class MigratableProcess implements Serializable, Runnable {
 
 	public abstract void suspend();
 
+	public abstract void stop();
 	@Override
 	public String toString() {
 		return new String("ProcessID: " + processID + "		Status: " + status);
@@ -42,6 +44,14 @@ public abstract class MigratableProcess implements Serializable, Runnable {
 
 	public void setStatus(StatusType stype) {
 		status = stype;
+	}
+
+	public boolean isComplete() {
+		return complete;
+	}
+
+	public void setComplete(boolean complete) {
+		this.complete = complete;
 	}
 
 }
