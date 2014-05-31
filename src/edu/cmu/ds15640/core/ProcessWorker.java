@@ -8,6 +8,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
@@ -34,7 +36,15 @@ public class ProcessWorker {
 	public ProcessWorker(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.currentMap = new HashMap<Integer, MigratableProcess>();
+		this.currentMap = new HashMap<Integer, MigratableProcess>();	
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
 	}
 
 	private void sendToManager(WorkerCommand sc) {
@@ -44,23 +54,27 @@ public class ProcessWorker {
 			System.err.println("fail to send manager");
 		}
 	}
-	
-	private void runProcess (MigratableProcess mp) {
+
+	private void runProcess(MigratableProcess mp) {
 		System.out.println("start process");
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		t = new Thread(mp);
-		t.start();
+//		t.start();
+		executor.execute(t);
 		currentMap.put(mp.getProcessID(), mp);
 		System.out.println("end process");
 	}
-	
+
 	private void handleStartCommand(MasterCommand masterCommand) {
 		WorkerCommand startCommand;
 		try {
 			processClass = ProcessWorker.class.getClassLoader().loadClass(
 					masterCommand.getProcessName());
-			Constructor constructor = processClass.getConstructor(String[].class);
-			Object[] passed = {masterCommand.getArgs()};
-			MigratableProcess process = (MigratableProcess) constructor.newInstance(passed);
+			Constructor constructor = processClass
+					.getConstructor(String[].class);
+			Object[] passed = { masterCommand.getArgs() };
+			MigratableProcess process = (MigratableProcess) constructor
+					.newInstance(passed);
 			process.setProcessID(masterCommand.getProcessID());
 			runProcess(process);
 
@@ -101,11 +115,12 @@ public class ProcessWorker {
 	private void handleInfoCommand() {
 		ArrayList<StatusType> statusList = new ArrayList<StatusType>();
 		ArrayList<Integer> pidList = new ArrayList<Integer>();
-		for (int i:currentMap.keySet()) {
+		for (int i : currentMap.keySet()) {
 			pidList.add(i);
 			statusList.add(currentMap.get(i).getStatus());
 		}
-		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO, statusList, pidList);
+		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO,
+				statusList, pidList);
 		sendToManager(infoCommand);
 	}
 
@@ -118,25 +133,18 @@ public class ProcessWorker {
 		sendToManager(migrateCommand);
 		System.out.println("finnish migrate");
 	}
-	
-	private void handleMigrateStartCommand (MasterCommand masterCommand) {
+
+	private void handleMigrateStartCommand(MasterCommand masterCommand) {
 		MigratableProcess mp = masterCommand.getMigratableProcess();
 		System.out.println("accept migration and start to run");
 		runProcess(mp);
 	}
-	
-	private void handleAssignIDCommand (MasterCommand masterCommand) {
+
+	private void handleAssignIDCommand(MasterCommand masterCommand) {
 		workID = masterCommand.getWorkerID();
 	}
 
 	public static void main(String[] args) {
-	/*
-		ProcessWorker worker = new ProcessWorker("localhost", 8888);
-		String[] arr = {"CHAPTER", "/Users/haoge/git/MigratableProcess/lifeofjesus.txt", "/Users/haoge/git/MigratableProcess/empty.txt"};
-		MasterCommand mc = new MasterCommand(CommandType.START, "edu.cmu.ds15640.core.GrepProcess", 1001, arr);
-		worker.handleStartCommand(mc);
-		
-  */
 		if (args.length == 2) {
 			String host = args[0];
 			int port = Integer.parseInt(args[1]);
@@ -162,10 +170,11 @@ public class ProcessWorker {
 				System.err.println("cannot create stream");
 				e.printStackTrace();
 			}
-			
+
 			while (!worker.stop) {
 				try {
-					MasterCommand masterCommand = (MasterCommand) worker.ois.readObject();
+					MasterCommand masterCommand = (MasterCommand) worker.ois
+							.readObject();
 					switch (masterCommand.getType().name().toLowerCase()) {
 					case "assignid":
 						worker.handleAssignIDCommand(masterCommand);
@@ -180,7 +189,9 @@ public class ProcessWorker {
 						worker.handleInfoCommand();
 						break;
 					case "migrate":
-						System.out.println("accept migrate command, target work ID" + masterCommand.getTargetWorkerID());
+						System.out
+								.println("accept migrate command, target work ID"
+										+ masterCommand.getTargetWorkerID());
 						worker.handleMigrateCommand(masterCommand);
 						break;
 					default:
@@ -195,7 +206,7 @@ public class ProcessWorker {
 					System.err.println("class not found");
 				}
 			}
-			
+
 			try {
 				worker.oos.close();
 				worker.ois.close();
@@ -207,6 +218,6 @@ public class ProcessWorker {
 		} else {
 			System.out.println("Please enter the host ip and port number");
 		}
-    
+
 	}
 }
