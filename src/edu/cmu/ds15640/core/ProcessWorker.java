@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
@@ -36,7 +34,7 @@ public class ProcessWorker {
 	public ProcessWorker(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.currentMap = new HashMap<Integer, MigratableProcess>();	
+		this.currentMap = new HashMap<Integer, MigratableProcess>();
 	}
 
 	public String getHost() {
@@ -57,10 +55,8 @@ public class ProcessWorker {
 
 	private void runProcess(MigratableProcess mp) {
 		System.out.println("start process");
-		ExecutorService executor = Executors.newSingleThreadExecutor();
 		t = new Thread(mp);
-//		t.start();
-		executor.execute(t);
+		t.start();
 		currentMap.put(mp.getProcessID(), mp);
 		System.out.println("end process");
 	}
@@ -116,8 +112,12 @@ public class ProcessWorker {
 		ArrayList<StatusType> statusList = new ArrayList<StatusType>();
 		ArrayList<Integer> pidList = new ArrayList<Integer>();
 		for (int i : currentMap.keySet()) {
+			MigratableProcess mp = currentMap.get(i);
+			if (mp.isComplete()) {
+				mp.setStatus(StatusType.COMPLETED);
+			}
 			pidList.add(i);
-			statusList.add(currentMap.get(i).getStatus());
+			statusList.add(mp.getStatus());
 		}
 		WorkerCommand infoCommand = new WorkerCommand(CommandType.RETURNINFO,
 				statusList, pidList);
@@ -142,6 +142,12 @@ public class ProcessWorker {
 
 	private void handleAssignIDCommand(MasterCommand masterCommand) {
 		workID = masterCommand.getWorkerID();
+	}
+
+	private void handleKillCommand(MasterCommand masterCommand) {
+		MigratableProcess mp = currentMap.remove(masterCommand.getProcessID());
+		mp.suspend();
+		System.out.println("Successfully kill the process");
 	}
 
 	public static void main(String[] args) {
@@ -193,6 +199,9 @@ public class ProcessWorker {
 								.println("accept migrate command, target work ID"
 										+ masterCommand.getTargetWorkerID());
 						worker.handleMigrateCommand(masterCommand);
+						break;
+					case "kill":
+						worker.handleKillCommand(masterCommand);
 						break;
 					default:
 						System.out.println("Wrong command: "
