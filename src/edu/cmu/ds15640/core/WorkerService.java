@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
 import edu.cmu.ds15640.command.WorkerCommand;
@@ -39,12 +38,16 @@ public class WorkerService extends Thread {
 				int processID = process.getProcessID();
 				MasterCommand sc = new MasterCommand(CommandType.MIGRATESTART, process);
 				//Update map
-				for(int i = 0; i < ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).size(); i++){
-					if(ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).get(i).getProcessID() == processID){
-						ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID).remove(i);
+				ArrayList<ProcessInfoWrapper> arr = ProcessManager.getInstance().getWorkerToProcesses().get(sourceWorkerID);
+				String processName = "";
+				for(int i = 0; i < arr.size(); i++){
+					if(arr.get(i).getProcessID() == processID){
+						processName = arr.get(i).getProcessName();
+						arr.remove(i);
+						break;
 					}
 				}
-				ProcessInfoWrapper wrapper = new ProcessInfoWrapper(process.getProcessID(), StatusType.RUNNING);
+				ProcessInfoWrapper wrapper = new ProcessInfoWrapper(process.getProcessID(), processName, StatusType.RUNNING);
 				ProcessManager.getInstance().getWorkerToProcesses().get(targetWorkerID).add(wrapper);
 				ProcessManager.getInstance().getWorkerToWorkerInfo().get(targetWorkerID).getWorkerService().writeToWorker(sc);
 			} catch (IOException e) {

@@ -4,15 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.reflections.Reflections;
+
 import edu.cmu.ds15640.command.CommandType;
 import edu.cmu.ds15640.command.MasterCommand;
+import edu.cmu.ds15640.process.MigratableProcess;
 
 public class ProcessManager {
-
 	private static int port;
 	private static ProcessManager processManager;
 	private final static Lock mutex = new ReentrantLock();
@@ -21,10 +25,13 @@ public class ProcessManager {
 	private int processIDCounter = 10000;
 	private RunnableServer runnableServer;
 	private RunnableHeartBeat runnableHeartBeat;
+	private Set<Class<? extends MigratableProcess>> availableProcesses;
 
 	private ProcessManager() {
 		workerToProcesses = new ConcurrentHashMap<Integer, ArrayList<ProcessInfoWrapper>>();
 		workerToWorkerInfo = new ConcurrentHashMap<Integer, WorkerInfo>();
+		Reflections reflections = new Reflections("edu.cmu.ds15640.process");
+		availableProcesses = reflections.getSubTypesOf(MigratableProcess.class);
 	}
 
 	public static ProcessManager getInstance() {
@@ -132,35 +139,6 @@ public class ProcessManager {
 		}
 	}
 
-	private ProcessInfoWrapper getProcessOnMachineWithID(int processID, int sourceWorkerID) {
-		ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(sourceWorkerID);
-		if(list == null){
-			return null;
-		}
-		for(ProcessInfoWrapper wrap: list){
-			if(wrap.getProcessID() == processID){
-				return wrap;
-			}
-		}
-		return null;
-	}
-
-	private void RemoveWorker(int workerID) {
-		workerToWorkerInfo.get(workerID).getWorkerService().stopWorker(workerID);
-	}
-
-	private ProcessInfoWrapper getProcessWithID(int processID) {
-		for(int i : workerToProcesses.keySet()){
-			ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(i);
-			for(ProcessInfoWrapper wrap: list){
-				if(wrap.getProcessID() == processID){
-					return wrap;
-				}
-			}
-		}
-		return null;
-	}
-
 	private void handleStartCommand(String[] strs) {
 		if(strs == null || strs.length < 3){
 			System.out.println("Wrong arguments, type 'help' for more information");
@@ -181,16 +159,13 @@ public class ProcessManager {
 		for(int i = 3; i < strs.length; i++){
 			args[i - 3] = strs[i];
 		}
-		try {
-			Class processClass = ProcessWorker.class.getClassLoader().loadClass(processName);
-		} catch (ClassNotFoundException e) {
+		if(!isValidProcessName(processName)){
 			System.out.println("The process is not exsit: " + processName);
-			System.out.println(e.toString());
 			return;
 		}
 		try {
 			MasterCommand sc = new MasterCommand(CommandType.START, processName, processIDCounter, args);
-			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, StatusType.RUNNING);
+			ProcessInfoWrapper wrapper = new ProcessInfoWrapper(processIDCounter, processName, StatusType.RUNNING);
 			workerToProcesses.get(workerID).add(wrapper);
 			processIDCounter++;
 			workerToWorkerInfo.get(workerID).getWorkerService().writeToWorker(sc);
@@ -232,6 +207,8 @@ public class ProcessManager {
 		sb.append("help:    list all command information\n");
 		sb.append("ls:      list all workers\n");
 		sb.append("ps:      list all processes\n");
+		sb.append("lsp:     list all available process classes\n");
+		sb.append("rm:      remove the failed process\n");
 		sb.append("start:   WORKERID PROCESSNAME ARG... \n        start the process with args...\n");
 		sb.append("migrate: PROCESSID WORKERID1 WORKERID2 \n        migrate the process between workers");
 		System.out.println(sb);
@@ -253,6 +230,46 @@ public class ProcessManager {
 			return;
 		}
 		wrap.setStatus(status);
+	}
+	
+	private boolean isValidProcessName(String processName) {
+		Iterator<Class<? extends MigratableProcess>> it = availableProcesses.iterator();
+		while(it.hasNext()){
+			Class<? extends MigratableProcess> process = it.next();
+			if(process.getSimpleName().equals(processName)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private ProcessInfoWrapper getProcessOnMachineWithID(int processID, int sourceWorkerID) {
+		ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(sourceWorkerID);
+		if(list == null){
+			return null;
+		}
+		for(ProcessInfoWrapper wrap: list){
+			if(wrap.getProcessID() == processID){
+				return wrap;
+			}
+		}
+		return null;
+	}
+
+	private void RemoveWorker(int workerID) {
+		workerToWorkerInfo.get(workerID).getWorkerService().stopWorker(workerID);
+	}
+
+	private ProcessInfoWrapper getProcessWithID(int processID) {
+		for(int i : workerToProcesses.keySet()){
+			ArrayList<ProcessInfoWrapper> list = workerToProcesses.get(i);
+			for(ProcessInfoWrapper wrap: list){
+				if(wrap.getProcessID() == processID){
+					return wrap;
+				}
+			}
+		}
+		return null;
 	}
 	
 	public void closeManager(){
