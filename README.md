@@ -13,3 +13,7 @@ migrate different in-progress processes.
 There are two interesting features we implement:
 1. Fault tolerant on worker server
 2. Real-time information update such as worker status and process status
+
+Author:
+Xincheng Liu
+Hao Ge
