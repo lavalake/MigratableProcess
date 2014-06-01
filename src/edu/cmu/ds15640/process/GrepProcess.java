@@ -68,7 +68,15 @@ public class GrepProcess extends MigratableProcess {
 		}
 
 		suspending = false;
-		
+		try {
+			inFile.close();
+			outFile.close();
+			out.close();
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void suspend() {
