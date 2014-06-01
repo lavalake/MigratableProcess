@@ -48,7 +48,7 @@ public class CountWords extends MigratableProcess {
 				
 				String[] words = line.split(" ");
 				count += words.length;
-				out.println("Number of words in current line:" + words.length + "Total words: "+ count);
+				out.println("Number of words in current line: " + words.length + " Total words: "+ count);
 				
 				
 				try {

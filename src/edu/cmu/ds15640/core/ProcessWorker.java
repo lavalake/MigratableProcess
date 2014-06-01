@@ -133,7 +133,7 @@ public class ProcessWorker {
 		WorkerCommand migrateCommand = new WorkerCommand(CommandType.MIGRATETO,
 				mp, masterCommand.getTargetWorkerID(), workID);
 		sendToManager(migrateCommand);
-		System.out.println("finnish migrate");
+		System.out.println("finish migrate");
 	}
 
 	private void handleMigrateStartCommand(MasterCommand masterCommand) {
