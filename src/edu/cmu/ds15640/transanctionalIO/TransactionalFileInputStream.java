@@ -16,7 +16,7 @@ public class TransactionalFileInputStream extends InputStream implements
 		Serializable {
 
 	private static final long serialVersionUID = 1922874444819579116L;
-	private int offset;
+	private long offset;
 	private transient RandomAccessFile randomAccessFile;
 	private Boolean migrated;
 	private String sourceFile;

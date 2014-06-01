@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class TransactionalFileOutputStream extends OutputStream implements
 		Serializable {
 	private static final long serialVersionUID = 7895673353100940930L;
-	private int offset;
+	private long offset;
 	private transient RandomAccessFile randomAccessFile;
 	private Boolean migrated;
 	private String targetFile;
