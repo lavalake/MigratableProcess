@@ -6,14 +6,16 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 
+/**
+ * Transactional FileInput Library - support the migrating process
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class TransactionalFileInputStream extends InputStream implements
 		Serializable {
 
-	/**
-	 * serialVersionUID
-	 */
 	private static final long serialVersionUID = 1922874444819579116L;
-
 	private int offset;
 	private transient RandomAccessFile randomAccessFile;
 	private Boolean migrated;
