@@ -69,6 +69,7 @@ public class GrepProcess extends MigratableProcess {
 
 		suspending = false;
 		try {
+			out.flush();
 			inFile.close();
 			outFile.close();
 			out.close();
