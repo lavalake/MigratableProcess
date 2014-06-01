@@ -45,6 +45,13 @@ public class ReverseProcess extends MigratableProcess {
 					break;
 				}
 				
+				out.println(reverse(line));
+				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+
+				}				
 			}
 			
 		} catch (EOFException e) {
@@ -53,17 +60,25 @@ public class ReverseProcess extends MigratableProcess {
 			System.out.println("TranslateProcess: Error: " + e);
 		}
 	}
+	
+	private String reverse(String input) {
+		String result = "";
+		for (int i = 0; i < input.length(); i++) {
+			result = input.substring(i, i+1) + result;
+		}
+		return result;
+	}
 
 	@Override
 	public void suspend() {
-		// TODO Auto-generated method stub
-		
+		suspending = true;
+		while (suspending)
+			;
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-		
+		complete = true;
 	}
 
 }
