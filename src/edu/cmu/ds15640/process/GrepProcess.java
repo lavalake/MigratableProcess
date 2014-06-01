@@ -43,8 +43,10 @@ public class GrepProcess extends MigratableProcess {
 			while (!suspending) {
 				String line = in.readLine();
 
-				if (line == null)
+				if (line == null){
+					stop();
 					break;
+				}
 
 				if (line.contains(query)) {
 					out.println(line);
@@ -66,7 +68,7 @@ public class GrepProcess extends MigratableProcess {
 		}
 
 		suspending = false;
-		stop();
+		
 	}
 
 	public void suspend() {

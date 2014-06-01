@@ -43,6 +43,7 @@ public class CountWords extends MigratableProcess {
 				String line = in.readLine();
 				
 				if (line == null) {
+					stop();
 					break;
 				}
 				
@@ -62,7 +63,7 @@ public class CountWords extends MigratableProcess {
 		}
 		
 		suspending = false;
-		stop();
+		
 	}
 
 	@Override
