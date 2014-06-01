@@ -42,6 +42,7 @@ public class ReverseProcess extends MigratableProcess {
 				String line = in.readLine();
 				
 				if (line == null) {
+					stop();
 					break;
 				}
 				
