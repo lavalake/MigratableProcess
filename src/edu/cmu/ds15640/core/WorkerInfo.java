@@ -1,5 +1,11 @@
 package edu.cmu.ds15640.core;
 
+/**
+ * Worker information for WorkerServer
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class WorkerInfo {
 	private int workerID;
 	private String IPAddress;

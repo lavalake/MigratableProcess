@@ -2,15 +2,17 @@ package edu.cmu.ds15640.core;
 
 import java.io.Serializable;
 
+/**
+ * ProcessInfoWrapper is used to wrap the process information
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class ProcessInfoWrapper implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4221885566660617590L;
-
-	int processID;
-	String processName;
-	StatusType status;
+	private int processID;
+	private String processName;
+	private StatusType status;
 
 	public ProcessInfoWrapper(int id, String name, StatusType type) {
 		processID = id;
@@ -44,7 +46,8 @@ public class ProcessInfoWrapper implements Serializable {
 
 	@Override
 	public String toString() {
-		return new String("ProcessID: " + processID + " ProcessName: " + processName + " Status: " + status);
+		return new String("ProcessID: " + processID + " ProcessName: "
+				+ processName + " Status: " + status);
 	}
 
 }

@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import edu.cmu.ds15640.core.StatusType;
 import edu.cmu.ds15640.process.MigratableProcess;
 
+/**
+ * WorkerCommand is used for WorkerServer
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class WorkerCommand implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2215252029261060551L;
 	private CommandType type;
 	private MigratableProcess migratableProcess;
-	//The targetWorkerID is for the target worker the process migrate to
 	private int sourceWorkerID;
 	private int targetWorkerID;
 	private StatusType status;
 	private int processId;
 	private ArrayList<StatusType> statusList;
-	//The processID is for the process that has already finished
 	private ArrayList<Integer> pidList;
 	
 	public WorkerCommand(CommandType ct) {

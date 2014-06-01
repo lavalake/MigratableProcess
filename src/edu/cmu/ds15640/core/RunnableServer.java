@@ -5,12 +5,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * Server thread - handle all connections and start workerService for each
+ * connection
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class RunnableServer implements Runnable {
 
 	private int port;
 	private volatile boolean stop;
 	private int workerID = 0;
-	
+
 	public RunnableServer(int port) {
 		this.port = port;
 	}
@@ -19,16 +26,23 @@ public class RunnableServer implements Runnable {
 	public void run() {
 		try {
 			ServerSocket serverSocket = new ServerSocket(port);
-			while(!stop){
+			while (!stop) {
 				Socket socket = serverSocket.accept();
 				System.out.println("one worker joins");
 				String IPAddress = socket.getInetAddress().toString();
 				int port = socket.getPort();
-				WorkerService workerService = new WorkerService(socket, workerID);
-				WorkerInfo newWorker = new WorkerInfo(workerID, IPAddress, port, workerService);
+				WorkerService workerService = new WorkerService(socket,
+						workerID);
+				WorkerInfo newWorker = new WorkerInfo(workerID, IPAddress,
+						port, workerService);
 				workerID++;
-				ProcessManager.getInstance().getWorkerToWorkerInfo().put(newWorker.getWorkerID(), newWorker);
-				ProcessManager.getInstance().getWorkerToProcesses().put(newWorker.getWorkerID(), new ArrayList<ProcessInfoWrapper>());
+				ProcessManager.getInstance().getWorkerToWorkerInfo()
+						.put(newWorker.getWorkerID(), newWorker);
+				ProcessManager
+						.getInstance()
+						.getWorkerToProcesses()
+						.put(newWorker.getWorkerID(),
+								new ArrayList<ProcessInfoWrapper>());
 				workerService.start();
 			}
 		} catch (IOException e) {
@@ -38,7 +52,7 @@ public class RunnableServer implements Runnable {
 		}
 	}
 
-	public void stopServer(){
+	public void stopServer() {
 		stop = true;
 	}
 }

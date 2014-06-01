@@ -4,22 +4,21 @@ import java.io.Serializable;
 
 import edu.cmu.ds15640.process.MigratableProcess;
 
+/**
+ * MasterCommand is used for MasterServer
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ */
 public class MasterCommand implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2245667253840915290L;
 	private CommandType type;
-	// ProcessID is for the getinfo
 	private int processID;
 
-	// migratableProcess, processName and args are for migrateTo
 	private MigratableProcess migratableProcess;
 	private String processName;
 	private String[] args;
 
-	// sourceWorkerID and targetWorker are for migrate
 	private int sourceWorkerID;
 	private int targetWorkerID;
 
