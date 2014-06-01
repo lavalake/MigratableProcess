@@ -63,7 +63,15 @@ public class CountWords extends MigratableProcess {
 		}
 		
 		suspending = false;
-		
+		try {
+			out.flush();
+			inFile.close();
+			outFile.close();
+			out.close();
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

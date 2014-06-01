@@ -58,16 +58,23 @@ public class ReverseProcess extends MigratableProcess {
 		} catch (EOFException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("TranslateProcess: Error: " + e);
+			System.out.println("ReverseProcess: Error: " + e);
+		}
+		suspending = false;
+		try {
+			out.flush();
+			inFile.close();
+			outFile.close();
+			out.close();
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	private String reverse(String input) {
-		String result = "";
-		for (int i = 0; i < input.length(); i++) {
-			result = input.substring(i, i+1) + result;
-		}
-		return result;
+		StringBuilder sb = new StringBuilder(input);
+		return sb.reverse().toString();
 	}
 
 	@Override
