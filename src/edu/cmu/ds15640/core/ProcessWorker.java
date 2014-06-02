@@ -14,6 +14,17 @@ import edu.cmu.ds15640.command.MasterCommand;
 import edu.cmu.ds15640.command.WorkerCommand;
 import edu.cmu.ds15640.process.MigratableProcess;
 
+
+/**
+ * ProcessWorker serves as the slave client. It accepts master's ip and port number in command line and 
+ * create socket connection. After that, it accepts the command from master and doing process. It will print
+ * some status information during work
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ * 
+ * */
+
 public class ProcessWorker {
 
 	private String host;
@@ -46,6 +57,10 @@ public class ProcessWorker {
 		return port;
 	}
 
+	/**
+	 * send method writes object into output stream
+	 * */
+	
 	private void sendToManager(WorkerCommand sc) {
 		try {
 			oos.writeObject(sc);
@@ -54,6 +69,10 @@ public class ProcessWorker {
 		}
 	}
 
+	/**
+	 * create a thread to run the process
+	 * */
+	
 	private void runProcess(MigratableProcess mp) {
 		System.out.println("start process");
 		t = new Thread(mp);
@@ -199,7 +218,7 @@ public class ProcessWorker {
 						break;
 					case "migrate":
 						System.out
-								.println("accept migrate command, target work ID"
+								.println("accept migrate command, target work"
 										+ masterCommand.getTargetWorkerID());
 						worker.handleMigrateCommand(masterCommand);
 						break;
