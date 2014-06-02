@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileInputStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileOutputStream;
 
-public class CountWords extends MigratableProcess {
+public class CountWordsProcess extends MigratableProcess {
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ public class CountWords extends MigratableProcess {
 	
 	private volatile boolean suspending;
 	
-	public CountWords(String args[]) throws Exception {
+	public CountWordsProcess(String args[]) throws Exception {
 		super();
 		if (args.length != 2) {
 			System.out.println("Please enter input file and output file");
