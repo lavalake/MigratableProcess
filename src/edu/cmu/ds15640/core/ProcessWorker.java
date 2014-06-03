@@ -287,6 +287,7 @@ public class ProcessWorker {
 				worker.oos.close();
 				worker.ois.close();
 				worker.socket.close();
+				System.out.println("Process Worker closed");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
