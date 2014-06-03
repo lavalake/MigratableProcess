@@ -7,6 +7,17 @@ import java.io.PrintStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileInputStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileOutputStream;
 
+/**
+ * Our example for Migratable Process
+ * Input a text file
+ * Count number of words in each line and the total words in 
+ * a file
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ * 
+ * */
+
 public class CountWordsProcess extends MigratableProcess {
 
 	/**

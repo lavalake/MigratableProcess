@@ -8,6 +8,17 @@ import java.io.PrintStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileInputStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileOutputStream;
 
+/**
+ * Our example for Migratable Process
+ * Input a text file 
+ * Reverse each line of string and output in a 
+ * new file
+ * 
+ * @author Xincheng Liu
+ * @author Hao Ge
+ * 
+ * */
+
 public class ReverseProcess extends MigratableProcess {
 	
 	/**

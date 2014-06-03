@@ -6,7 +6,10 @@ import edu.cmu.ds15640.core.StatusType;
 
 
 /**
+ * Abstract class for Migratable Process
  * 
+ * @author Xincheng Liu
+ * @author Hao Ge
  * 
  * */
 
