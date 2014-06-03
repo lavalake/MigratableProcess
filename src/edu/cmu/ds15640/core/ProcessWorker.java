@@ -207,7 +207,11 @@ public class ProcessWorker {
 			String host = args[0];
 			int port = Integer.parseInt(args[1]);
 			ProcessWorker worker = new ProcessWorker(host, port);
-
+			
+			/**
+			 *  Build the socket connection
+			 * */
+			
 			try {
 				worker.socket = new Socket(host, port);
 			} catch (IOException e) {
@@ -217,6 +221,10 @@ public class ProcessWorker {
 			}
 
 			System.out.println("Create socket");
+			
+			/**
+			 * Create the input and output stream
+			 * */
 
 			try {
 				worker.oos = new ObjectOutputStream(
@@ -229,6 +237,13 @@ public class ProcessWorker {
 				e.printStackTrace();
 			}
 
+			
+			/**
+			 * Wait for the command from master and handle each 
+			 * command
+			 * 
+			 * */
+			
 			while (!worker.stop) {
 				try {
 					MasterCommand masterCommand = (MasterCommand) worker.ois

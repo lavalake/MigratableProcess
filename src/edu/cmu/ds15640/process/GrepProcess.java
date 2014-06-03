@@ -10,6 +10,13 @@ import java.lang.InterruptedException;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileInputStream;
 import edu.cmu.ds15640.transanctionalIO.TransactionalFileOutputStream;
 
+/**
+ * GrepProcess from the lab requirements. We modify some part in order to make
+ * it work in our framework. Since our MigratableProcess is abstract class this 
+ * class extends MigratableProcess class.
+ * 
+ * */
+
 public class GrepProcess extends MigratableProcess {
 	/**
 	 * serialVersionUID
@@ -68,6 +75,11 @@ public class GrepProcess extends MigratableProcess {
 		}
 
 		suspending = false;
+		
+		/**
+		 * close the transactional file stream
+		 * */
+		
 		try {
 			out.flush();
 			inFile.close();

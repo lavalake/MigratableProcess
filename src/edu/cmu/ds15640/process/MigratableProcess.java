@@ -4,6 +4,12 @@ import java.io.Serializable;
 
 import edu.cmu.ds15640.core.StatusType;
 
+
+/**
+ * 
+ * 
+ * */
+
 public abstract class MigratableProcess implements Serializable, Runnable {
 
 	/**
