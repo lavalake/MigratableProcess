@@ -79,6 +79,11 @@ public class ProcessWorker {
 		t.start();
 		currentMap.put(mp.getProcessID(), mp);
 	}
+	
+	/**
+	 * use reflection to handle start command
+	 * Find process based on class name
+	 * **/
 
 	private void handleStartCommand(MasterCommand masterCommand) {
 		WorkerCommand startCommand;
@@ -129,6 +134,12 @@ public class ProcessWorker {
 		sendToManager(startCommand);
 	}
 
+	/**
+	 * return current running process and the status 
+	 * respond to heartbeating
+	 * 
+	 * **/
+	
 	private void handleInfoCommand() {
 		ArrayList<StatusType> statusList = new ArrayList<StatusType>();
 		ArrayList<Integer> pidList = new ArrayList<Integer>();
@@ -144,6 +155,11 @@ public class ProcessWorker {
 				statusList, pidList);
 		sendToManager(infoCommand);
 	}
+	
+	/**
+	 * Package the process into a command object and send back to server
+	 * 
+	 * **/
 
 	private void handleMigrateCommand(MasterCommand masterCommand) {
 		MigratableProcess mp = currentMap.get(masterCommand.getProcessID());
@@ -155,15 +171,29 @@ public class ProcessWorker {
 		System.out.println("finish migrate");
 	}
 
+	/**
+	 * Accept the migrated process from master and resume the process 
+	 * 
+	 * */
+	
 	private void handleMigrateStartCommand(MasterCommand masterCommand) {
 		MigratableProcess mp = masterCommand.getMigratableProcess();
-		System.out.println("accept migration and start to run");
+		System.out.println("accept migrated process and start to run the process");
 		runProcess(mp);
 	}
+	
+	/**
+	 * Accept ID from server
+	 * */
 
 	private void handleAssignIDCommand(MasterCommand masterCommand) {
 		workID = masterCommand.getWorkerID();
 	}
+	
+	/**
+	 * Permanently kill a process. Remove from local Hashmap
+	 * 
+	 * */
 
 	private void handleKillCommand(MasterCommand masterCommand) {
 		System.out.println(masterCommand.getProcessID());
