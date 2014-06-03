@@ -129,7 +129,7 @@ public class ProcessWorker {
 			startCommand = new WorkerCommand(CommandType.STARTRETURN,
 					StatusType.FAIL, masterCommand.getProcessID());
 			System.err.println("Invalid Argument");
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		sendToManager(startCommand);
 	}

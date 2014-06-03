@@ -30,7 +30,8 @@ public class WorkerService extends Thread {
 			ois = new ObjectInputStream(s.getInputStream());
 			oos = new ObjectOutputStream(s.getOutputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Fail to open inputStream and outputStream for worker: " + workerID);
+			//e.printStackTrace();
 		}
 	}
 
@@ -110,7 +111,7 @@ public class WorkerService extends Thread {
 		try {
 			writeToWorker(masterCommand);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			//e1.printStackTrace();
 			stopWorker(workerID);
 		}
 		while (!stop) {
@@ -118,10 +119,10 @@ public class WorkerService extends Thread {
 				workerCommand = (WorkerCommand) ois.readObject();
 				handleReply(workerCommand);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IOException e) {
 				System.out.println("The workerID: " + workerID + " is failed");
-				e.printStackTrace();
+				//e.printStackTrace();
 				stopWorker(workerID);
 			}
 		}

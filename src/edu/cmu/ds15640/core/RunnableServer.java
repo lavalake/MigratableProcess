@@ -47,7 +47,7 @@ public class RunnableServer implements Runnable {
 			}
 		} catch (IOException e) {
 			System.out.println("Server Network Exception");
-			e.printStackTrace();
+			//e.printStackTrace();
 			ProcessManager.getInstance().closeManager();
 		}
 	}

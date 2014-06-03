@@ -71,7 +71,7 @@ public class ProcessManager {
 			try {
 				line = br.readLine();
 			} catch (IOException e) {
-				System.out.println(e.toString());
+				System.out.println("Exception in command line IO");
 				closeManager();
 			}
 			handleCommand(line);
@@ -159,7 +159,7 @@ public class ProcessManager {
 					.writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
 			removeWorker(workerID);
 			return;
 		}
@@ -211,7 +211,7 @@ public class ProcessManager {
 					.writeToWorker(migrateCommand);
 		} catch (IOException e) {
 			System.out.println("Worker: " + sourceWorkerID + " is failed");
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
 			removeWorker(sourceWorkerID);
 			return;
 		}
@@ -263,7 +263,7 @@ public class ProcessManager {
 					.writeToWorker(sc);
 		} catch (IOException e) {
 			System.out.println("Worker: " + workerID + " is failed");
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
 			removeWorker(workerID);
 			return;
 		}

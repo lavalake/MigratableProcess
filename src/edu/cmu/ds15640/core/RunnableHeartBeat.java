@@ -32,7 +32,7 @@ public class RunnableHeartBeat implements Runnable {
 							+ ProcessManager.getInstance()
 									.getWorkerToWorkerInfo().get(id)
 									.getWorkerID() + " is failed");
-					System.out.println(e.toString());
+					//System.out.println(e.toString());
 					ProcessManager.getInstance().getWorkerToWorkerInfo()
 							.get(id).getWorkerService().stopWorker(id);
 					return;
@@ -41,7 +41,7 @@ public class RunnableHeartBeat implements Runnable {
 			try {
 				Thread.sleep(10 * Timer.ONE_SECOND);
 			} catch (InterruptedException e) {
-				System.out.println(e.toString());
+				//System.out.println(e.toString());
 			}
 		}
 	}
